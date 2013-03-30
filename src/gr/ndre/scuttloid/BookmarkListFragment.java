@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import gr.ndre.scuttloid.dummy.DummyContent;
+import gr.ndre.scuttloid.bookmark.BookmarkContent;
 
 /**
  * A list fragment representing a list of Bookmarks. This fragment also supports
@@ -30,7 +30,7 @@ public class BookmarkListFragment extends ListFragment {
 	 * The fragment's current callback object, which is notified of list item
 	 * clicks.
 	 */
-	private Callbacks mCallbacks = sDummyCallbacks;
+	private Callbacks mCallbacks = sBookmarkCallbacks;
 
 	/**
 	 * The current activated item position. Only used on tablets.
@@ -53,7 +53,7 @@ public class BookmarkListFragment extends ListFragment {
 	 * A dummy implementation of the {@link Callbacks} interface that does
 	 * nothing. Used only when this fragment is not attached to an activity.
 	 */
-	private static Callbacks sDummyCallbacks = new Callbacks() {
+	private static Callbacks sBookmarkCallbacks = new Callbacks() {
 		@Override
 		public void onItemSelected(String id) {
 		}
@@ -71,9 +71,9 @@ public class BookmarkListFragment extends ListFragment {
 		super.onCreate(savedInstanceState);
 
 		// TODO: replace with a real list adapter.
-		setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
+		setListAdapter(new ArrayAdapter<BookmarkContent.BookmarkItem>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, DummyContent.ITEMS));
+				android.R.id.text1, BookmarkContent.ITEMS));
 	}
 
 	@Override
@@ -105,8 +105,8 @@ public class BookmarkListFragment extends ListFragment {
 	public void onDetach() {
 		super.onDetach();
 
-		// Reset the active callbacks interface to the dummy implementation.
-		mCallbacks = sDummyCallbacks;
+		// Reset the active callbacks interface to the bookmark implementation.
+		mCallbacks = sBookmarkCallbacks;
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class BookmarkListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+		mCallbacks.onItemSelected(BookmarkContent.ITEMS.get(position).id);
 	}
 
 	@Override
