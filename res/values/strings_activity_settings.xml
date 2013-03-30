@@ -1,0 +1,13 @@
+<resources>
+
+    <string name="title_activity_settings">Scuttloid Settings</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_url">Semantic Scuttle URL</string>
+    <string name="pref_url_summary">Address of your Semantic Scuttle server</string>
+    <string name="pref_username">Semantic Scuttle username</string>
+    <string name="pref_username_summary">Your username on Semantic Scuttle</string>
+    <string name="pref_password">Password</string>
+    <string name="pref_password_summary">Your password on Semantic Scuttle</string>
+
+</resources>

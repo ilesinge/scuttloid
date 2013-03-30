@@ -29,6 +29,30 @@ public class BookmarkListActivity extends FragmentActivity implements
 	}
 
 	/**
+	 * Display option menu
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main_menu, menu);
+	    return true;
+	}
+	
+	/**
+	 * Option menu clicks
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.settings:
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
 	 * Callback method from {@link BookmarkListFragment.Callbacks} indicating
 	 * that the item with the given ID was selected.
 	 */
