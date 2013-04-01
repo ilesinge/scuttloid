@@ -10,9 +10,7 @@ import android.widget.TextView;
 import gr.ndre.scuttloid.bookmark.BookmarkContent;
 
 /**
- * A fragment representing a single Bookmark detail screen. This fragment is
- * either contained in a {@link BookmarkListActivity} in two-pane mode (on
- * tablets) or a {@link BookmarkDetailActivity} on handsets.
+ * A fragment representing a single Bookmark detail screen.
  */
 public class BookmarkDetailFragment extends Fragment {
 	/**
