@@ -20,14 +20,14 @@ public class BookmarksXMLHandler extends DefaultHandler {
 			bookmark.url = attributes.getValue("href");
 			bookmark.title = attributes.getValue("description");
 			/*
-			HashMap<String, String> curBookmark = new HashMap<String, String>();
+			TODO : Add all fields (including "extended") to bookmark item
+			
 			curBookmark.put("href", attributes.getValue("href"));
 			curBookmark.put("description", attributes.getValue("description"));
 			curBookmark.put("hash", attributes.getValue("hash"));
 			curBookmark.put("tag", attributes.getValue("tag"));
 			curBookmark.put("time", attributes.getValue("time"));
 			*/
-			// this.bookmarks.add(curBookmark);
 			this.bookmarks.addItem(bookmark);
 		}
 	}
