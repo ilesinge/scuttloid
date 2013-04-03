@@ -52,12 +52,6 @@ public class BookmarkContent {
 		
 		public String url;
 		public String title;
-
-		// TODO : Remove this useless constructor
-		public Item(String url, String title) {
-			this.url = url;
-			this.title = title;
-		}
 		
 		public Item() {}
 
