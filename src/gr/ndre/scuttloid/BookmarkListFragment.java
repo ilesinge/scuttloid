@@ -52,15 +52,22 @@ public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Boo
 	 */
 	public BookmarkListFragment() {
 	}
+	
+	@Override
+	public void onBookmarksReceived(BookmarkContent bookmarks) {
+		this.bookmarks = bookmarks;
+		setListAdapter(new ArrayAdapter<BookmarkContent.Item>(getActivity(),
+				R.layout.bookmark_list_item,
+				R.id.title, this.bookmarks.getItems()));
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// TODO: replace with a real list adapter.
-		setListAdapter(new ArrayAdapter<BookmarkContent.BookmarkItem>(getActivity(),
-				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, BookmarkContent.ITEMS));
+		
+		ScuttleAPI api = ((ScuttloidActivity) this.getActivity()).getAPI(this);
+		api.getBookmarks();
+		// TODO : only retrieve bookmarks if we don't have them yet !
 	}
 
 	@Override

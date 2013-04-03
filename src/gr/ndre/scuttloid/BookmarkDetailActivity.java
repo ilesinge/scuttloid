@@ -14,7 +14,7 @@ import android.view.MenuItem;
  * This activity is mostly just a 'shell' activity containing nothing more than
  * a {@link BookmarkDetailFragment}.
  */
-public class BookmarkDetailActivity extends FragmentActivity {
+public class BookmarkDetailActivity extends ScuttloidActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
