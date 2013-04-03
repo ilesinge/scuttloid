@@ -19,14 +19,6 @@ public class BookmarkContent {
 	}
 	
 	/**
-	 * Get item by URL
-	 * TODO : Remove this useless accessor
-	 */
-	public Item getItem(String url) {
-		return item_map.get(url);
-	}
-	
-	/**
 	 * Get item list
 	 */
 	public List<Item> getItems() {
