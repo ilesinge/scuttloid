@@ -7,41 +7,42 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import gr.ndre.scuttloid.bookmark.BookmarkContent;
 
 /**
  * A list fragment representing a list of Bookmarks.
  * <p>
- * Activities containing this fragment MUST implement the {@link Callbacks}
+ * Activities containing this fragment MUST implement the {@link Callback}
  * interface.
  */
-public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Callback {
-
+public class BookmarkListFragment extends ListFragment implements ScuttleAPI.BookmarksCallback {
+	
+	BookmarkContent bookmarks;
+	
 	/**
 	 * The fragment's current callback object, which is notified of list item
 	 * clicks.
 	 */
-	private Callbacks mCallbacks = sBookmarkCallbacks;
+	private Callback mCallback = sBookmarkCallback;
 
 	/**
 	 * A callback interface that all activities containing this fragment must
 	 * implement. This mechanism allows activities to be notified of item
 	 * selections.
 	 */
-	public interface Callbacks {
+	public interface Callback {
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(String id);
+		public void onItemSelected(BookmarkContent.Item item);
 	}
 
 	/**
-	 * A dummy implementation of the {@link Callbacks} interface that does
+	 * A dummy implementation of the {@link Callback} interface that does
 	 * nothing. Used only when this fragment is not attached to an activity.
 	 */
-	private static Callbacks sBookmarkCallbacks = new Callbacks() {
+	private static Callback sBookmarkCallback = new Callback() {
 		@Override
-		public void onItemSelected(String id) {
+		public void onItemSelected(BookmarkContent.Item item) {
 		}
 	};
 
@@ -67,12 +68,12 @@ public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Cal
 		super.onAttach(activity);
 
 		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof Callbacks)) {
+		if (!(activity instanceof Callback)) {
 			throw new IllegalStateException(
 					"Activity must implement fragment's callbacks.");
 		}
 
-		mCallbacks = (Callbacks) activity;
+		mCallback = (Callback) activity;
 	}
 
 	@Override
@@ -80,7 +81,7 @@ public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Cal
 		super.onDetach();
 
 		// Reset the active callbacks interface to the bookmark implementation.
-		mCallbacks = sBookmarkCallbacks;
+		mCallback = sBookmarkCallback;
 	}
 
 	@Override
@@ -90,7 +91,7 @@ public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Cal
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(BookmarkContent.ITEMS.get(position).id);
+		mCallback.onItemSelected(bookmarks.getItem(position));
 	}
 	
 }

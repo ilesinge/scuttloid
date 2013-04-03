@@ -2,7 +2,6 @@ package gr.ndre.scuttloid;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
@@ -38,8 +37,8 @@ public class BookmarkDetailActivity extends FragmentActivity {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putString(BookmarkDetailFragment.ARG_ITEM_ID, getIntent()
-					.getStringExtra(BookmarkDetailFragment.ARG_ITEM_ID));
+			arguments.putSerializable(BookmarkDetailFragment.ARG_ITEM, getIntent()
+					.getSerializableExtra(BookmarkDetailFragment.ARG_ITEM));
 			BookmarkDetailFragment fragment = new BookmarkDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()

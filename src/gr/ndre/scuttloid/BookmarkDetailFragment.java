@@ -7,22 +7,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import gr.ndre.scuttloid.bookmark.BookmarkContent;
 
 /**
  * A fragment representing a single Bookmark detail screen.
  */
 public class BookmarkDetailFragment extends Fragment {
+	
 	/**
-	 * The fragment argument representing the item ID that this fragment
+	 * The fragment argument representing the item URL that this fragment
 	 * represents.
 	 */
-	public static final String ARG_ITEM_ID = "item_id";
+	public static final String ARG_ITEM = "item";
 
 	/**
 	 * The bookmark content this fragment is presenting.
 	 */
-	private BookmarkContent.BookmarkItem mItem;
+	private BookmarkContent.Item mItem;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -35,12 +35,11 @@ public class BookmarkDetailFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (getArguments().containsKey(ARG_ITEM_ID)) {
+		if (getArguments().containsKey(ARG_ITEM)) {
 			// Load the bookmark content specified by the fragment
 			// arguments. In a real-world scenario, use a Loader
 			// to load content from a content provider.
-			mItem = BookmarkContent.ITEM_MAP.get(getArguments().getString(
-					ARG_ITEM_ID));
+			mItem = (BookmarkContent.Item) getArguments().getSerializable(ARG_ITEM);
 		}
 	}
 
@@ -53,7 +52,7 @@ public class BookmarkDetailFragment extends Fragment {
 		// Show the bookmark content as text in a TextView.
 		if (mItem != null) {
 			((TextView) rootView.findViewById(R.id.bookmark_detail))
-					.setText(mItem.content);
+					.setText(mItem.title);
 		}
 
 		return rootView;

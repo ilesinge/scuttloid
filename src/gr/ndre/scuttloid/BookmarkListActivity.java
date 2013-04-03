@@ -2,7 +2,6 @@ package gr.ndre.scuttloid;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,11 +14,11 @@ import android.view.MenuItem;
  * The list of items is a {@link BookmarkListFragment}.
  * <p>
  * This activity also implements the required
- * {@link BookmarkListFragment.Callbacks} interface to listen for item
+ * {@link BookmarkListFragment.Callback} interface to listen for item
  * selections.
  */
-public class BookmarkListActivity extends FragmentActivity implements
-		BookmarkListFragment.Callbacks {
+public class BookmarkListActivity extends ScuttloidActivity implements
+		BookmarkListFragment.Callback {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +52,17 @@ public class BookmarkListActivity extends FragmentActivity implements
 	}
 	
 	/**
-	 * Callback method from {@link BookmarkListFragment.Callbacks} indicating
-	 * that the item with the given ID was selected.
+	 * Callback method from {@link BookmarkListFragment.Callback} indicating
+	 * that the item was selected.
 	 */
 	@Override
-	public void onItemSelected(String id) {
-		// Start the detail activity for the selected item ID.
+	public void onItemSelected(BookmarkContent.Item item) {
+		// Start the detail activity for the selected item url.
 		Intent detailIntent = new Intent(this, BookmarkDetailActivity.class);
-		detailIntent.putExtra(BookmarkDetailFragment.ARG_ITEM_ID, id);
+		Bundle extras = new Bundle();
+		extras.putSerializable(BookmarkDetailFragment.ARG_ITEM, item);
+		detailIntent.putExtra(BookmarkDetailFragment.ARG_ITEM, item);
 		startActivity(detailIntent);
 	}
+	
 }
