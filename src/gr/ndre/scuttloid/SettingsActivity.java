@@ -1,11 +1,13 @@
 package gr.ndre.scuttloid;
 
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 
 
 /**
@@ -38,6 +40,7 @@ public class SettingsActivity extends PreferenceActivity {
  			// guidelines.
             bindPreferenceSummaryToValue(findPreference("url"));
             bindPreferenceSummaryToValue(findPreference("username"));
+            bindPreferenceSummaryToValue(findPreference("password"));
         }
     }
     
@@ -57,14 +60,33 @@ public class SettingsActivity extends PreferenceActivity {
 					int index = listPreference.findIndexOfValue(stringValue);
 	
 					// Set the summary to reflect the new value.
-					preference
-							.setSummary(index >= 0 ? listPreference.getEntries()[index]
-									: null);
-				} else {
+					preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
+				}
+				else if (preference instanceof EditTextPreference) {
+					// For passwords, display dots as summary
+					int type = ((EditTextPreference) preference).getEditText().getInputType();
+					if (type == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+						int length = stringValue.length();
+						StringBuilder sb = new StringBuilder(length);
+					    for (int i=0; i<length; i++ ) {
+					        sb.append("●"); 
+					    }
+						preference.setSummary(sb.toString());
+					}
+					// For other types, just set the value as summary
+					else {
+						preference.setSummary(stringValue);
+					}
+				}
+				else {
 					// For all other preferences, set the summary to the value's
 					// simple string representation.
 					preference.setSummary(stringValue);
 				}
+			}
+			else {
+				// Put back the default summary
+				preference.setSummary((CharSequence)preference.getExtras().get("default_summary"));
 			}
 			return true;
 		}
@@ -80,6 +102,9 @@ public class SettingsActivity extends PreferenceActivity {
 	 * @see #sBindPreferenceSummaryToValueListener
 	 */
 	private static void bindPreferenceSummaryToValue(Preference preference) {
+		// Save the default summary for later use if preference is cleared
+		preference.getExtras().putCharSequence("default_summary", preference.getSummary());
+		
 		// Set the listener to watch for value changes.
 		preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
