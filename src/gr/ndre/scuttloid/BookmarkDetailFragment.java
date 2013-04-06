@@ -14,8 +14,7 @@ import android.widget.TextView;
 public class BookmarkDetailFragment extends Fragment {
 	
 	/**
-	 * The fragment argument representing the item URL that this fragment
-	 * represents.
+	 * The fragment argument representing the item that this fragment represents.
 	 */
 	public static final String ARG_ITEM = "item";
 
@@ -49,10 +48,10 @@ public class BookmarkDetailFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_bookmark_detail,
 				container, false);
 
-		// Show the bookmark content as text in a TextView.
+		// Show the bookmark content as text in TextViews.
 		if (mItem != null) {
-			((TextView) rootView.findViewById(R.id.bookmark_detail))
-					.setText(mItem.title);
+			((TextView) rootView.findViewById(R.id.bookmark_title)).setText(mItem.title);
+			((TextView) rootView.findViewById(R.id.bookmark_url)).setText(mItem.url);
 		}
 
 		return rootView;
