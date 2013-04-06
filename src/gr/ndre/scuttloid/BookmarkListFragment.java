@@ -1,7 +1,10 @@
 package gr.ndre.scuttloid;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -68,7 +71,23 @@ public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Boo
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		String pref_url = ((ScuttloidActivity) this.getActivity()).getURL();
+		if (pref_url.equals("")) {
+			startActivity(new Intent(this.getActivity(), SettingsActivity.class));
+		}
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
 		// TODO : verify if the bookmarks are reloaded on orientation change
+		String pref_url = ((ScuttloidActivity) this.getActivity()).getURL();
+		if (!pref_url.equals("") && !(this.bookmarks instanceof BookmarkContent)) {
+			this.loadBookmarks();
+		}
+	}
+	
+	protected void loadBookmarks() {
 		ScuttleAPI api = ((ScuttloidActivity) this.getActivity()).getAPI(this);
 		api.getBookmarks();
 	}
