@@ -52,19 +52,15 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 			InputStream content = response.getEntity().getContent();
 			Xml.parse(content, Xml.Encoding.UTF_8, this.handler);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// TODO Properly display error messages
 			System.out.println(e.getMessage());
 		}
 		client.close();
-		
-		System.out.println("after request");
-		
 		return null;
 	}
 	
     public void onPostExecute(Void param)
     {
-    	System.out.println("post task");
         this.callback.onDataReceived(this.handler);
     }
 

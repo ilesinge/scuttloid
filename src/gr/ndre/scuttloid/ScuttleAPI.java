@@ -49,19 +49,14 @@ public class ScuttleAPI implements APITask.Callback {
 	
 	@Override
 	public void onDataReceived(DefaultHandler handler) {
-		System.out.println("data received");
-
 		switch (this.handler) {
 			case BOOKMARKS:
-				//System.out.println((BookmarksXMLHandler)handler);
 				BookmarkContent bookmarks = ((BookmarksXMLHandler)handler).getBookmarks();
 				((BookmarksCallback) this.callback).onBookmarksReceived(bookmarks);
 				break;
 			default:
 				
 		}
-		
-		//this.callback.onDataReceived("received handler");
 	}
 	
 	protected APITask getAPITask() {

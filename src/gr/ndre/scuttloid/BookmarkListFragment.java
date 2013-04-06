@@ -16,6 +16,9 @@ import android.widget.ListView;
  */
 public class BookmarkListFragment extends ListFragment implements ScuttleAPI.BookmarksCallback {
 	
+	/**
+	 * Container for all bookmarks
+	 */
 	BookmarkContent bookmarks;
 	
 	/**
@@ -65,9 +68,9 @@ public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Boo
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		// TODO : verify if the bookmarks are reloaded on orientation change
 		ScuttleAPI api = ((ScuttloidActivity) this.getActivity()).getAPI(this);
 		api.getBookmarks();
-		// TODO : only retrieve bookmarks if we don't have them yet !
 	}
 
 	@Override
