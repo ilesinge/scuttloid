@@ -1,6 +1,9 @@
 package gr.ndre.scuttloid;
 
 import org.xml.sax.helpers.DefaultHandler;
+
+import android.content.Context;
+
 import java.util.Locale;
 
 /**
@@ -15,7 +18,10 @@ public class ScuttleAPI implements APITask.Callback {
 	protected String password;
 	protected Integer handler;
 	
-	public static interface Callback {}
+	public static interface Callback {
+		public void onAPIError(String message);
+		public Context getContext();
+	}
 	
 	public static interface ResultCallback extends Callback {
 		public void onDataReceived(String data);
@@ -25,7 +31,7 @@ public class ScuttleAPI implements APITask.Callback {
 		public void onBookmarksReceived(BookmarkContent bookmarks);
 	}
 	
-	Callback callback;
+	protected Callback callback;
 	
 	/**
 	 * Constructor injecting mandatory preferences
@@ -78,6 +84,19 @@ public class ScuttleAPI implements APITask.Callback {
 			}
 		}
 		return url;
+	}
+
+	@Override
+	public void onError(int status) {
+		String message = "";
+		switch (status) {
+			case APITask.UNKNOWN_HOST:
+				message = this.callback.getContext().getString(R.string.error_unknownhost);
+				break;
+		}
+		if (message != "") {
+			this.callback.onAPIError(message);
+		}
 	}
 
 }

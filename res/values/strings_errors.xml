@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- All error messages -->
+    <string name="error_unknownhost">The server address could not be resolved. Please verify Semantic Scuttle server URL in the settings.</string>
+    
+</resources>

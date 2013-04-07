@@ -1,10 +1,10 @@
 package gr.ndre.scuttloid;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -22,7 +22,7 @@ public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Boo
 	/**
 	 * Container for all bookmarks
 	 */
-	BookmarkContent bookmarks;
+	protected BookmarkContent bookmarks;
 	
 	/**
 	 * The fragment's current callback object, which is notified of list item
@@ -121,6 +121,18 @@ public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Boo
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
 		mCallback.onItemSelected(bookmarks.getItem(position));
+	}
+
+	@Override
+	public void onAPIError(String message) {
+	    AlertDialog alert = new AlertDialog.Builder(this.getActivity()).create();
+	    alert.setMessage(message);  
+	    alert.show();
+	}
+
+	@Override
+	public Context getContext() {
+		return this.getActivity();
 	}
 	
 }

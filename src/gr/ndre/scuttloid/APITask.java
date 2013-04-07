@@ -1,6 +1,7 @@
 package gr.ndre.scuttloid;
 
 import java.io.InputStream;
+import java.net.UnknownHostException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -15,13 +16,17 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 
 	public static interface Callback {
         public void onDataReceived(DefaultHandler handler);
+        public void onError(int status);
     }
 	
-	Callback callback;
-	String url;
-	String username;
-	String password;
-	DefaultHandler handler;
+	protected Callback callback;
+	protected String url;
+	protected String username;
+	protected String password;
+	protected DefaultHandler handler;
+	protected int status;
+	
+	public static final int UNKNOWN_HOST = 1001;
 	
 	APITask(Callback callback, String username, String password) {
 		this.callback = callback;
@@ -51,17 +56,26 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 			HttpResponse response = client.execute(request);
 			InputStream content = response.getEntity().getContent();
 			Xml.parse(content, Xml.Encoding.UTF_8, this.handler);
-		} catch (Exception e) {
+		}
+		catch (UnknownHostException e) {
+			this.status = UNKNOWN_HOST;
+		}
+		catch (Exception e) {
 			// TODO Properly display error messages
-			System.out.println(e.getMessage());
+			System.out.println(e.getClass().getName());
 		}
 		client.close();
 		return null;
 	}
 	
-    public void onPostExecute(Void param)
-    {
-        this.callback.onDataReceived(this.handler);
-    }
+	public void onPostExecute(Void param)
+	{
+		if (this.status >= 400) {
+			this.callback.onError(this.status);
+		}
+		else {
+			this.callback.onDataReceived(this.handler);
+		}
+	}
 
 }
