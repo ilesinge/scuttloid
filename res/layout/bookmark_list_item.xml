@@ -4,11 +4,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-	<TextView 
+	<TextView
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:padding="5dp"
 	    android:id="@+id/title"
-	    android:textSize="16sp"/>
+	    android:textSize="16sp"
+	    android:textIsSelectable="false"/>
+	<TextView
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:padding="5dp"
+	    android:id="@+id/tags"
+	    android:textSize="12sp"
+	    android:textIsSelectable="false"/>
 	
 </LinearLayout>

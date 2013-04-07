@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 
@@ -62,9 +61,12 @@ public class BookmarkListFragment extends ListFragment implements ScuttleAPI.Boo
 	@Override
 	public void onBookmarksReceived(BookmarkContent bookmarks) {
 		this.bookmarks = bookmarks;
-		setListAdapter(new ArrayAdapter<BookmarkContent.Item>(getActivity(),
-				R.layout.bookmark_list_item,
-				R.id.title, this.bookmarks.getItems()));
+		BookmarkListAdapter adapter = new BookmarkListAdapter(
+				(Context)this.getActivity(),
+				R.id.title,
+				this.bookmarks.getItems()
+		);
+		setListAdapter(adapter);
 	}
 
 	@Override

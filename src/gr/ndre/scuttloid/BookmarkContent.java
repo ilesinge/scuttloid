@@ -3,7 +3,6 @@ package gr.ndre.scuttloid;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +20,7 @@ public class BookmarkContent {
 	/**
 	 * Get item list
 	 */
-	public List<Item> getItems() {
+	public ArrayList<Item> getItems() {
 		return items;
 	}
 	
@@ -33,7 +32,7 @@ public class BookmarkContent {
 	/**
 	 * An array of bookmark items.
 	 */
-	protected List<Item> items = new ArrayList<Item>();
+	protected ArrayList<Item> items = new ArrayList<Item>();
 
 	/**
 	 * Add a bookmark to the collection.
@@ -52,6 +51,7 @@ public class BookmarkContent {
 		
 		public String url;
 		public String title;
+		public String tags;
 		
 		// TODO maybe add URL as mandatory param in constructor
 		public Item() {}

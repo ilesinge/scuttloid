@@ -19,6 +19,7 @@ public class BookmarksXMLHandler extends DefaultHandler {
 			BookmarkContent.Item bookmark = new BookmarkContent.Item();
 			bookmark.url = attributes.getValue("href");
 			bookmark.title = attributes.getValue("description");
+			bookmark.tags = attributes.getValue("tag");
 			this.bookmarks.addItem(bookmark);
 			/*
 			TODO : Add all fields (including "extended") to bookmark item

@@ -10,6 +10,11 @@
 	    android:layout_height="wrap_content"
 	    android:textIsSelectable="true" />
 	<TextView
+	    android:id="@+id/bookmark_tags"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:textIsSelectable="true" />
+	<TextView
 	    android:id="@+id/bookmark_url"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
