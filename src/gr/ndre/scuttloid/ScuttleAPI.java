@@ -84,6 +84,9 @@ public class ScuttleAPI implements APITask.Callback {
 			case APITask.PARSE_ERROR:
 				message = this.callback.getContext().getString(R.string.error_xmlparse);
 				break;
+			case APITask.SSL_ERROR:
+				message = this.callback.getContext().getString(R.string.error_sslconnection);
+				break;
 			case HttpStatus.SC_UNAUTHORIZED:
 				message = this.callback.getContext().getString(R.string.error_authentication);
 				break;
@@ -92,8 +95,9 @@ public class ScuttleAPI implements APITask.Callback {
 				message = this.callback.getContext().getString(R.string.error_notfound);
 				break;
 			default:
-				// TODO : Manage all issues ! Or display a generic message.
-				System.out.println(String.valueOf(status));
+				message = this.callback.getContext().getString(R.string.error_apigeneric);
+				break;
+				//System.out.println(String.valueOf(status));
 		}
 		if (message != "") {
 			this.callback.onAPIError(message);

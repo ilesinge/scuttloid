@@ -3,6 +3,8 @@ package gr.ndre.scuttloid;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.xml.sax.SAXException;
@@ -27,8 +29,10 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 	protected DefaultHandler handler;
 	protected int status = 0;
 	
+	public static final int GENERIC_ERROR = 1000;
 	public static final int UNKNOWN_HOST = 1001;
 	public static final int PARSE_ERROR = 1002;
+	public static final int SSL_ERROR = 1003;
 	
 	APITask(Callback callback, String username, String password) {
 		this.callback = callback;
@@ -72,9 +76,12 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		catch (SAXException e) {
 			this.status = PARSE_ERROR;
 		}
+		catch (SSLHandshakeException e) {
+			this.status = SSL_ERROR;
+		}
 		catch (Exception e) {
-			// TODO Properly display error messages
-			System.out.println(e.getClass().getName());
+			this.status = GENERIC_ERROR;
+			//System.out.println(e.getClass().getName());
 		}
 		client.close();
 		return null;
