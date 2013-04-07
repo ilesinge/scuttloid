@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.net.http.AndroidHttpClient;
@@ -24,9 +25,10 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 	protected String username;
 	protected String password;
 	protected DefaultHandler handler;
-	protected int status;
+	protected int status = 0;
 	
 	public static final int UNKNOWN_HOST = 1001;
+	public static final int PARSE_ERROR = 1002;
 	
 	APITask(Callback callback, String username, String password) {
 		this.callback = callback;
@@ -54,11 +56,21 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		
 		try {
 			HttpResponse response = client.execute(request);
+			int status = response.getStatusLine().getStatusCode();
+			if (status >= 300) {
+				this.status = status;
+				// TODO : parse eventual error message !
+				client.close();
+				return null;
+			}
 			InputStream content = response.getEntity().getContent();
 			Xml.parse(content, Xml.Encoding.UTF_8, this.handler);
 		}
 		catch (UnknownHostException e) {
 			this.status = UNKNOWN_HOST;
+		}
+		catch (SAXException e) {
+			this.status = PARSE_ERROR;
 		}
 		catch (Exception e) {
 			// TODO Properly display error messages
@@ -70,7 +82,7 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 	
 	public void onPostExecute(Void param)
 	{
-		if (this.status >= 400) {
+		if (this.status > 0) {
 			this.callback.onError(this.status);
 		}
 		else {

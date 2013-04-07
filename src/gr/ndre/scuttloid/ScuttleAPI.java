@@ -1,5 +1,6 @@
 package gr.ndre.scuttloid;
 
+import org.apache.http.HttpStatus;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.Context;
@@ -93,6 +94,19 @@ public class ScuttleAPI implements APITask.Callback {
 			case APITask.UNKNOWN_HOST:
 				message = this.callback.getContext().getString(R.string.error_unknownhost);
 				break;
+			case APITask.PARSE_ERROR:
+				message = this.callback.getContext().getString(R.string.error_xmlparse);
+				break;
+			case HttpStatus.SC_UNAUTHORIZED:
+				message = this.callback.getContext().getString(R.string.error_authentication);
+				break;
+			case HttpStatus.SC_NOT_FOUND:
+				// TODO : in some cases, 404 could mean "item not found" when deleting
+				message = this.callback.getContext().getString(R.string.error_notfound);
+				break;
+			default:
+				// TODO : Manage all issues ! Or display a generic message.
+				System.out.println(String.valueOf(status));
 		}
 		if (message != "") {
 			this.callback.onAPIError(message);
