@@ -4,8 +4,7 @@ import org.apache.http.HttpStatus;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.Context;
-
-import java.util.Locale;
+import android.webkit.URLUtil;
 
 /**
  * Enclose all API calls to Semantic Scuttle server
@@ -72,19 +71,7 @@ public class ScuttleAPI implements APITask.Callback {
 	}
 	
 	protected String getBaseURL() {
-		String url = this.url;
-		if( url.length() > 0 ) {
-			String last = url.substring(url.length()-1);
-			if( !last.equals("/") ) {
-				url += "/";
-			}
-			String http = url.substring(0,7).toLowerCase(Locale.US);
-			String https = url.substring(0,8).toLowerCase(Locale.US);
-			if (http.compareTo("http://") != 0 && https.compareTo("https://") != 0) {
-				url = "http://"+url;
-			}
-		}
-		return url;
+		return URLUtil.guessUrl(this.url);
 	}
 
 	@Override
