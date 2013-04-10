@@ -4,6 +4,7 @@ import org.apache.http.HttpStatus;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.webkit.URLUtil;
 
 /**
@@ -36,10 +37,10 @@ public class ScuttleAPI implements APITask.Callback {
 	/**
 	 * Constructor injecting mandatory preferences
 	 */
-	public ScuttleAPI(String url, String username, String password, Callback callback) {
-		this.url = url;
-		this.username = username;
-		this.password = password;
+	public ScuttleAPI(SharedPreferences preferences, Callback callback) {
+		this.url = preferences.getString("url", "");
+		this.username = preferences.getString("username", "");
+		this.password = preferences.getString("password", "");
 		this.callback = callback;
 	}
 	

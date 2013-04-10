@@ -1,10 +1,17 @@
 package gr.ndre.scuttloid;
 
+import android.app.AlertDialog;
+import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
 
 /**
  * An activity representing a list of Bookmarks. The activity
@@ -17,14 +24,34 @@ import android.view.MenuItem;
  * {@link BookmarkListFragment.Callback} interface to listen for item
  * selections.
  */
-public class BookmarkListActivity extends ScuttloidActivity implements
-		BookmarkListFragment.Callback {
+public class BookmarkListActivity extends ListActivity implements ScuttleAPI.BookmarksCallback {
 
+	/**
+	 * Container for all bookmarks
+	 */
+	protected BookmarkContent bookmarks;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//setContentView(android.R.layout.list_content);
 		setContentView(R.layout.activity_bookmark_list);
-		// TODO: If exposing deep links into your app, handle intents here.
+		
+		String pref_url = getURL();
+		if (pref_url.equals("")) {
+			startActivity(new Intent(this, SettingsActivity.class));
+		}
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		// TODO : verify if the bookmarks are reloaded on orientation change
+		String pref_url = getURL();
+		if (!pref_url.equals("") && !(bookmarks instanceof BookmarkContent)) {
+			loadBookmarks();
+		}
 	}
 
 	/**
@@ -51,16 +78,53 @@ public class BookmarkListActivity extends ScuttloidActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 	
-	/**
-	 * Callback method from {@link BookmarkListFragment.Callback} indicating
-	 * that the item was selected.
-	 */
 	@Override
-	public void onItemSelected(BookmarkContent.Item item) {
-		// Start the detail activity for the selected item url.
+	public void onListItemClick(ListView listView, View view, int position,
+			long id) {
+		super.onListItemClick(listView, view, position, id);
+
+		// Start the detail activity for the selected item.
+		BookmarkContent.Item item = bookmarks.getItem(position);
 		Intent detailIntent = new Intent(this, BookmarkDetailActivity.class);
 		detailIntent.putExtra(BookmarkDetailActivity.ARG_ITEM, item);
 		startActivity(detailIntent);
+	}
+	
+	protected void loadBookmarks() {
+		ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
+		api.getBookmarks();
+	}
+	
+	@Override
+	public void onBookmarksReceived(BookmarkContent bookmarks) {
+		this.bookmarks = bookmarks;
+		BookmarkListAdapter adapter = new BookmarkListAdapter(
+				this,
+				R.id.title,
+				this.bookmarks.getItems()
+		);
+		setListAdapter(adapter);
+	}
+	
+	@Override
+	public void onAPIError(String message) {
+	    AlertDialog alert = new AlertDialog.Builder(this).create();
+	    alert.setMessage(message);  
+	    alert.show();
+	}
+
+	@Override
+	public Context getContext() {
+		return this;
+	}
+	
+	public String getURL() {
+		return this.getGlobalPreferences().getString("url", "");
+	}
+	
+	protected SharedPreferences getGlobalPreferences() {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
+		return preferences;
 	}
 	
 }

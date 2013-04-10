@@ -1,7 +1,7 @@
 package gr.ndre.scuttloid;
 
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 
 public class BookmarkEditActivity extends Activity {
 

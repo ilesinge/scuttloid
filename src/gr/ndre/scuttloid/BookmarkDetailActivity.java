@@ -1,5 +1,6 @@
 package gr.ndre.scuttloid;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,7 +17,7 @@ import android.widget.TextView;
  * This activity is mostly just a 'shell' activity containing nothing more than
  * a {@link BookmarkDetailFragment}.
  */
-public class BookmarkDetailActivity extends ScuttloidActivity {
+public class BookmarkDetailActivity extends Activity {
 
 	/**
 	 * The bundle extra representing the item that this activity must display.
@@ -64,6 +65,8 @@ public class BookmarkDetailActivity extends ScuttloidActivity {
 				return true;
 			case R.id.edit:
 				Intent intent = new Intent(this, BookmarkEditActivity.class);
+				intent.putExtra(ARG_ITEM,
+						getIntent().getSerializableExtra(ARG_ITEM));
 				startActivity(intent);
 				return true;
 		}
