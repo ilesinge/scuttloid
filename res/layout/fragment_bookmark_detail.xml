@@ -9,6 +9,14 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:textIsSelectable="true" />
+
+	<TextView
+	    android:id="@+id/bookmark_summary"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="5dp"
+	    android:textIsSelectable="true" />
+
 	<TextView
 	    android:id="@+id/bookmark_tags"
 	    android:layout_width="match_parent"

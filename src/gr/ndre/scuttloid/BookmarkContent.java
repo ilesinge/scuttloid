@@ -52,6 +52,7 @@ public class BookmarkContent {
 		public String url;
 		public String title;
 		public String tags;
+		public String summary;
 		
 		// TODO maybe add URL as mandatory param in constructor
 		public Item() {}
