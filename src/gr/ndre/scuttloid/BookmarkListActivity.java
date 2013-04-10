@@ -59,7 +59,7 @@ public class BookmarkListActivity extends ScuttloidActivity implements
 	public void onItemSelected(BookmarkContent.Item item) {
 		// Start the detail activity for the selected item url.
 		Intent detailIntent = new Intent(this, BookmarkDetailActivity.class);
-		detailIntent.putExtra(BookmarkDetailFragment.ARG_ITEM, item);
+		detailIntent.putExtra(BookmarkDetailActivity.ARG_ITEM, item);
 		startActivity(detailIntent);
 	}
 	

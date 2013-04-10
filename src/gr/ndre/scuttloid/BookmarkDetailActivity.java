@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 /**
  * An activity representing a single Bookmark detail screen. This activity is
@@ -17,6 +18,16 @@ import android.view.MenuItem;
  */
 public class BookmarkDetailActivity extends ScuttloidActivity {
 
+	/**
+	 * The bundle extra representing the item that this activity must display.
+	 */
+	public static final String ARG_ITEM = "item";
+	
+	/**
+	 * The bookmark content this activity is presenting.
+	 */
+	private BookmarkContent.Item item;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -25,25 +36,13 @@ public class BookmarkDetailActivity extends ScuttloidActivity {
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		// savedInstanceState is non-null when there is fragment state
-		// saved from previous configurations of this activity
-		// (e.g. when rotating the screen from portrait to landscape).
-		// In this case, the fragment will automatically be re-added
-		// to its container so we don't need to manually add it.
-		// For more information, see the Fragments API guide at:
-		//
-		// http://developer.android.com/guide/components/fragments.html
-		//
-		if (savedInstanceState == null) {
-			// Create the detail fragment and add it to the activity
-			// using a fragment transaction.
-			Bundle arguments = new Bundle();
-			arguments.putSerializable(BookmarkDetailFragment.ARG_ITEM, getIntent()
-					.getSerializableExtra(BookmarkDetailFragment.ARG_ITEM));
-			BookmarkDetailFragment fragment = new BookmarkDetailFragment();
-			fragment.setArguments(arguments);
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.bookmark_detail_container, fragment).commit();
+		item = (BookmarkContent.Item) getIntent().getSerializableExtra(ARG_ITEM);
+		
+		if (item != null) {
+			((TextView) findViewById(R.id.bookmark_title)).setText(item.title);
+			((TextView) findViewById(R.id.bookmark_summary)).setText(item.summary);
+			((TextView) findViewById(R.id.bookmark_tags)).setText(item.getCommaSeparatedTags());
+			((TextView) findViewById(R.id.bookmark_url)).setText(item.url);
 		}
 	}
 	
