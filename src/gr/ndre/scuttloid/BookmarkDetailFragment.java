@@ -51,8 +51,8 @@ public class BookmarkDetailFragment extends Fragment {
 		// Show the bookmark content as text in TextViews.
 		if (mItem != null) {
 			((TextView) rootView.findViewById(R.id.bookmark_title)).setText(mItem.title);
-			((TextView) rootView.findViewById(R.id.bookmark_url)).setText(mItem.summary);
-			((TextView) rootView.findViewById(R.id.bookmark_tags)).setText(mItem.tags);
+			((TextView) rootView.findViewById(R.id.bookmark_summary)).setText(mItem.summary);
+			((TextView) rootView.findViewById(R.id.bookmark_tags)).setText(mItem.getCommaSeparatedTags());
 			((TextView) rootView.findViewById(R.id.bookmark_url)).setText(mItem.url);
 		}
 

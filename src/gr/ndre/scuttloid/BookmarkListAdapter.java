@@ -30,7 +30,7 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item> {
 
 		if (item != null) {
 			((TextView)view.findViewById(R.id.title)).setText(item.title);
-			((TextView)view.findViewById(R.id.tags)).setText(item.tags);
+			((TextView)view.findViewById(R.id.tags)).setText(item.getCommaSeparatedTags());
 		}
 
 		return view;

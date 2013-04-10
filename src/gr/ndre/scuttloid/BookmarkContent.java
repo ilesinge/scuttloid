@@ -61,5 +61,20 @@ public class BookmarkContent {
 		public String toString() {
 			return title;
 		}
+		
+		public String getCommaSeparatedTags() {
+			String output = "";
+			String[] atags = this.tags.split(" ");
+			if (atags.length > 0) {
+				StringBuilder sb = new StringBuilder();
+				sb.append(atags[0]);
+				for (int i=1; i<atags.length; i++) {
+					sb.append(", ");
+					sb.append(atags[i]);
+				}
+				output = sb.toString();
+			}
+			return output;
+		}
 	}
 }
