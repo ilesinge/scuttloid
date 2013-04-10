@@ -7,13 +7,15 @@
     <uses-sdk
         android:minSdkVersion="11"
         android:targetSdkVersion="17" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" android:logo="@drawable/ic_launcher">
+        android:logo="@drawable/ic_launcher"
+        android:theme="@style/AppTheme" >
         <activity
             android:name="gr.ndre.scuttloid.BookmarkListActivity"
             android:label="@string/app_name" >
@@ -34,6 +36,10 @@
         <activity
             android:name="gr.ndre.scuttloid.SettingsActivity"
             android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name="gr.ndre.scuttloid.BookmarkEditActivity"
+            android:label="@string/title_bookmark_edit" >
         </activity>
     </application>
 

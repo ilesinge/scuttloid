@@ -1,6 +1,9 @@
 package gr.ndre.scuttloid;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 /**
@@ -43,13 +46,27 @@ public class BookmarkDetailActivity extends ScuttloidActivity {
 					.add(R.id.bookmark_detail_container, fragment).commit();
 		}
 	}
+	
+	/**
+	 * Display option menu
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.detail_menu, menu);
+	    return true;
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
-			finish();
-			return true;
+			case android.R.id.home:
+				finish();
+				return true;
+			case R.id.edit:
+				Intent intent = new Intent(this, BookmarkEditActivity.class);
+				startActivity(intent);
+				return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
