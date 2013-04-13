@@ -4,28 +4,28 @@
    	android:padding="12dp"
    	xmlns:android="http://schemas.android.com/apk/res/android">
 	<TextView
-	    android:id="@+id/bookmark_title"
+	    android:id="@+id/title"
 	    style="?android:attr/textAppearanceLarge"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:textIsSelectable="true" />
 
 	<TextView
-	    android:id="@+id/bookmark_summary"
+	    android:id="@+id/description"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_marginTop="5dp"
 	    android:textIsSelectable="true" />
 
 	<TextView
-	    android:id="@+id/bookmark_tags"
+	    android:id="@+id/tags"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_marginTop="5dp"
 	    android:textIsSelectable="true" />
 
 	<TextView
-	    android:id="@+id/bookmark_url"
+	    android:id="@+id/url"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_marginTop="5dp"

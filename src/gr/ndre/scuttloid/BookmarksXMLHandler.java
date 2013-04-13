@@ -20,7 +20,7 @@ public class BookmarksXMLHandler extends DefaultHandler {
 			bookmark.url = attributes.getValue("href");
 			bookmark.title = attributes.getValue("description");
 			bookmark.tags = attributes.getValue("tag");
-			bookmark.summary = attributes.getValue("extended");
+			bookmark.description = attributes.getValue("extended");
 			this.bookmarks.addItem(bookmark);
 		}
 	}

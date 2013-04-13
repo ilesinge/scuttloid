@@ -38,12 +38,11 @@ public class BookmarkDetailActivity extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		item = (BookmarkContent.Item) getIntent().getSerializableExtra(ARG_ITEM);
-		
 		if (item != null) {
-			((TextView) findViewById(R.id.bookmark_title)).setText(item.title);
-			((TextView) findViewById(R.id.bookmark_summary)).setText(item.summary);
-			((TextView) findViewById(R.id.bookmark_tags)).setText(item.getCommaSeparatedTags());
-			((TextView) findViewById(R.id.bookmark_url)).setText(item.url);
+			((TextView) findViewById(R.id.title)).setText(item.title);
+			((TextView) findViewById(R.id.description)).setText(item.description);
+			((TextView) findViewById(R.id.tags)).setText(item.getCommaSeparatedTags());
+			((TextView) findViewById(R.id.url)).setText(item.url);
 		}
 	}
 	
