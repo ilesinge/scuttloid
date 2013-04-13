@@ -7,5 +7,6 @@
     <string name="error_notfound">It seems that the server address is incorrect. Please verify Semantic Scuttle server URL in the settings.</string>
     <string name="error_sslconnection">An error occurred while trying to establish a SSL (https) connection with the server. </string>
     <string name="error_apigeneric">An error occurred while trying to communicate with the server.</string>
+    <string name="error_titlerequired">A title is required</string>
     
 </resources>

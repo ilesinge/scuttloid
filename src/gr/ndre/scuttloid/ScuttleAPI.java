@@ -1,6 +1,11 @@
 package gr.ndre.scuttloid;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.Context;
@@ -13,6 +18,7 @@ import android.webkit.URLUtil;
 public class ScuttleAPI implements APITask.Callback {
 	
 	protected static final int BOOKMARKS = 0;
+	protected static final int UPDATE = 1;
 
 	protected String url;
 	protected String username;
@@ -30,6 +36,10 @@ public class ScuttleAPI implements APITask.Callback {
 	
 	public static interface BookmarksCallback extends Callback {
 		public void onBookmarksReceived(BookmarkContent bookmarks);
+	}
+	
+	public static interface UpdateCallback extends Callback {
+		
 	}
 	
 	protected Callback callback;
@@ -51,6 +61,29 @@ public class ScuttleAPI implements APITask.Callback {
 		url += "api/posts_all.php";
 		task.setURL(url);
 		task.setHandler(new BookmarksXMLHandler());
+		task.execute();
+	}
+	
+	public void updateBookmark(BookmarkContent.Item item) {
+		this.handler = UPDATE;
+		APITask task = this.getAPITask();
+		String url = this.getBaseURL();
+		url += "api/posts_add.php";
+		task.setURL(url);
+		task.setMethod(APITask.METHOD_POST);
+		
+		// Prepare post data
+		List<NameValuePair> params = new ArrayList<NameValuePair>(6);
+		params.add(new BasicNameValuePair("url", item.url));
+		params.add(new BasicNameValuePair("description", item.title));
+		params.add(new BasicNameValuePair("extended", item.description));
+		params.add(new BasicNameValuePair("tags", item.tags));
+		params.add(new BasicNameValuePair("status", item.status));
+		// Force bookmark replacement
+		params.add(new BasicNameValuePair("replace", "yes"));
+		task.setData(params);
+		
+		// TODO : add a basic response handler !
 		task.execute();
 	}
 	

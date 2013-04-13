@@ -1,12 +1,20 @@
 package gr.ndre.scuttloid;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import javax.net.ssl.SSLHandshakeException;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.protocol.HTTP;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -22,12 +30,17 @@ public class APITask extends AsyncTask<Void, Void, Void> {
         public void onError(int status);
     }
 	
+	public static final int METHOD_GET = 0;
+	public static final int METHOD_POST = 1;
+	
 	protected Callback callback;
 	protected String url;
 	protected String username;
 	protected String password;
 	protected DefaultHandler handler;
 	protected int status = 0;
+	protected int method = METHOD_GET;
+	protected List<NameValuePair> data;
 	
 	public static final int GENERIC_ERROR = 1000;
 	public static final int UNKNOWN_HOST = 1001;
@@ -48,10 +61,33 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		this.handler = handler;
 	}
 
+	public void setData(List<NameValuePair> data) {
+		this.data = data;
+	}
+	
+	public void setMethod(int method) {
+		this.method = method;
+	}
+	
 	@Override
 	protected Void doInBackground(Void... params) {
 		AndroidHttpClient client = AndroidHttpClient.newInstance("gr.ndre.scuttloid");
-		HttpGet request = new HttpGet(this.url);
+		
+		HttpRequestBase request;
+		if (this.method == METHOD_POST) {
+			request = new HttpPost(this.url);
+			if (this.data != null) {
+				try {
+					((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(this.data, HTTP.UTF_8));
+				} catch (UnsupportedEncodingException e) {
+					this.status = GENERIC_ERROR;
+					client.close();
+					return null;
+				}
+			}
+		} else {
+			request = new HttpGet(this.url);
+		}
 		
 		// Add Basic Authentication header
 		String authentication = username+":"+password;
@@ -63,12 +99,15 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 			int status = response.getStatusLine().getStatusCode();
 			if (status >= 300) {
 				this.status = status;
+				System.out.println(status);
 				// TODO : parse eventual error message !
 				client.close();
 				return null;
 			}
-			InputStream content = response.getEntity().getContent();
-			Xml.parse(content, Xml.Encoding.UTF_8, this.handler);
+			if (this.handler != null) {
+				InputStream content = response.getEntity().getContent();
+				Xml.parse(content, Xml.Encoding.UTF_8, this.handler);
+			}
 		}
 		catch (UnknownHostException e) {
 			this.status = UNKNOWN_HOST;
