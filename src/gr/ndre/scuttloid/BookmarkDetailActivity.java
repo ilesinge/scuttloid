@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
@@ -40,9 +42,19 @@ public class BookmarkDetailActivity extends Activity {
 		item = (BookmarkContent.Item) getIntent().getSerializableExtra(ARG_ITEM);
 		if (item != null) {
 			((TextView) findViewById(R.id.title)).setText(item.title);
-			((TextView) findViewById(R.id.description)).setText(item.description);
-			((TextView) findViewById(R.id.tags)).setText(item.getCommaSeparatedTags());
+			this.setTextOrRemove(R.id.description, item.description);
+			this.setTextOrRemove(R.id.tags, item.getCSVTags());
 			((TextView) findViewById(R.id.url)).setText(item.url);
+		}
+	}
+	
+	protected void setTextOrRemove(int id, String value) {
+		if (value != null && !value.isEmpty()) {
+			((TextView) findViewById(id)).setText(value);
+		}
+		else {
+			View view = findViewById(id);
+			((LinearLayout)view.getParent()).removeView(view);
 		}
 	}
 	

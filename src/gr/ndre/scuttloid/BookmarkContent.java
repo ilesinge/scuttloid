@@ -51,7 +51,7 @@ public class BookmarkContent {
 		
 		public String url;
 		public String title;
-		public String tags;
+		protected String tags;
 		public String description;
 		public String status;
 		
@@ -63,13 +63,21 @@ public class BookmarkContent {
 			return title;
 		}
 		
-		public String getCommaSeparatedTags() {
+		public String getTags() {
+			String tags = "";
+			if (!this.tags.equals("system:unfiled")) {
+				tags = this.tags;
+			}
+			return tags;
+		}
+		
+		public String getCSVTags() {
 			String output = "";
-			String[] atags = this.tags.split(" ");
+			String[] atags = this.getTags().split(" ");
 			if (atags.length > 0) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(atags[0]);
-				for (int i=1; i<atags.length; i++) {
+				for (int i = 1; i < atags.length; i++) {
 					sb.append(", ");
 					sb.append(atags[i]);
 				}

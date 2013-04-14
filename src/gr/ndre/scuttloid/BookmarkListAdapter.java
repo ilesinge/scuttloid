@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item> {
@@ -30,7 +31,14 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item> {
 
 		if (item != null) {
 			((TextView)view.findViewById(R.id.title)).setText(item.title);
-			((TextView)view.findViewById(R.id.tags)).setText(item.getCommaSeparatedTags());
+			String tags = item.getCSVTags();
+			if (!tags.isEmpty()) {
+				((TextView)view.findViewById(R.id.tags)).setText(item.getCSVTags());
+			}
+			else {
+				View tags_view = view.findViewById(R.id.tags);
+				((LinearLayout)tags_view.getParent()).removeView(tags_view);
+			}
 		}
 
 		return view;

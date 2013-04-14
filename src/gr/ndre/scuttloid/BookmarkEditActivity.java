@@ -36,7 +36,7 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 			((TextView) findViewById(R.id.url)).setText(item.url);
 			((TextView) findViewById(R.id.title)).setText(item.title);
 			((TextView) findViewById(R.id.description)).setText(item.description);
-			((TextView) findViewById(R.id.tags)).setText(item.tags);
+			((TextView) findViewById(R.id.tags)).setText(item.getTags());
 		}
 		
 		// Setup the Privacy (status) spinner.
