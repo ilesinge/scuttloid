@@ -9,6 +9,25 @@ import java.util.Map;
  * Helper class for providing Bookmark content for user interfaces.
  */
 public class BookmarkContent {
+	
+	/**
+	 * Shared instance
+	 */
+	protected static BookmarkContent shared_content;
+	
+	/**
+	 * Get shared instance
+	 */
+	public static BookmarkContent getShared() {
+		return shared_content;
+	}
+	
+	/**
+	 * Set shared instance
+	 */
+	public static void setShared(BookmarkContent content) {
+		shared_content = content;
+	}
 
 	/**
 	 * Get item by location

@@ -32,7 +32,8 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		// Fill the form with actual bookmark data
-		item = (BookmarkContent.Item) getIntent().getSerializableExtra(BookmarkDetailActivity.ARG_ITEM);
+		int position = getIntent().getIntExtra(BookmarkDetailActivity.ARG_ITEM_POS, 0);
+		item = (BookmarkContent.Item) BookmarkContent.getShared().getItem(position);
 		if (item != null) {
 			((TextView) findViewById(R.id.url)).setText(item.url);
 			((TextView) findViewById(R.id.title)).setText(item.title);
@@ -105,6 +106,7 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 
 	@Override
 	public void onBookmarkUpdated() {
+		BookmarkContent.getShared().addItem(item);
 		Toast.makeText(this, getString(R.string.bookmark_updated), Toast.LENGTH_SHORT).show();
 		finish();
 	}

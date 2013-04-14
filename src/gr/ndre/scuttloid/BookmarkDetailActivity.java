@@ -22,9 +22,14 @@ import android.widget.TextView;
 public class BookmarkDetailActivity extends Activity {
 
 	/**
-	 * The bundle extra representing the item that this activity must display.
+	 * The bundle extra representing the position of the item in the shared content list.
 	 */
-	public static final String ARG_ITEM = "item";
+	public static final String ARG_ITEM_POS = "item_pos";
+	
+	/**
+	 * The bookmark's position in the shared content list
+	 */
+	private int position;
 	
 	/**
 	 * The bookmark content this activity is presenting.
@@ -38,9 +43,19 @@ public class BookmarkDetailActivity extends Activity {
 
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
-		item = (BookmarkContent.Item) getIntent().getSerializableExtra(ARG_ITEM);
-		if (item != null) {
+		
+		position = getIntent().getIntExtra(ARG_ITEM_POS, 0);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		displayBookmark();
+	}
+	
+	protected void displayBookmark() {
+		this.item = BookmarkContent.getShared().getItem(position);
+		if (this.item != null) {
 			((TextView) findViewById(R.id.title)).setText(item.title);
 			this.setTextOrRemove(R.id.description, item.description);
 			this.setTextOrRemove(R.id.tags, item.getCSVTags());
@@ -76,8 +91,7 @@ public class BookmarkDetailActivity extends Activity {
 				return true;
 			case R.id.edit:
 				Intent intent = new Intent(this, BookmarkEditActivity.class);
-				intent.putExtra(ARG_ITEM,
-						getIntent().getSerializableExtra(ARG_ITEM));
+				intent.putExtra(ARG_ITEM_POS, getIntent().getIntExtra(ARG_ITEM_POS, 0));
 				startActivity(intent);
 				return true;
 		}

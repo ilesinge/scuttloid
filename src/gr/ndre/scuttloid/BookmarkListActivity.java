@@ -47,10 +47,14 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	public void onResume() {
 		super.onResume();
 		
-		// TODO : verify if the bookmarks are reloaded on orientation change
+		// TODO : verify that the bookmarks are not reloaded on orientation change
 		String pref_url = getURL();
 		if (!pref_url.equals("") && !(bookmarks instanceof BookmarkContent)) {
 			loadBookmarks();
+		}
+		if (bookmarks instanceof BookmarkContent) {
+			bookmarks = BookmarkContent.getShared();
+			displayBookmarks();
 		}
 	}
 
@@ -84,9 +88,8 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		super.onListItemClick(listView, view, position, id);
 
 		// Start the detail activity for the selected item.
-		BookmarkContent.Item item = bookmarks.getItem(position);
 		Intent detailIntent = new Intent(this, BookmarkDetailActivity.class);
-		detailIntent.putExtra(BookmarkDetailActivity.ARG_ITEM, item);
+		detailIntent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
 		startActivity(detailIntent);
 	}
 	
@@ -100,14 +103,7 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		api.getBookmarks();
 	}
 	
-	@Override
-	public void onBookmarksReceived(BookmarkContent bookmarks) {
-		this.bookmarks = bookmarks;
-		
-		// Remove the progress bar
-		ProgressBar progress_bar = (ProgressBar) findViewById(R.id.progress_bar);
-		progress_bar.setVisibility(View.GONE);
-		
+	protected void displayBookmarks() {
 		// Set the list adapter
 		BookmarkListAdapter adapter = new BookmarkListAdapter(
 				this,
@@ -115,6 +111,18 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 				this.bookmarks.getItems()
 		);
 		setListAdapter(adapter);
+	}
+	
+	@Override
+	public void onBookmarksReceived(BookmarkContent bookmarks) {
+		this.bookmarks = bookmarks;
+		BookmarkContent.setShared(bookmarks);
+		
+		// Remove the progress bar
+		ProgressBar progress_bar = (ProgressBar) findViewById(R.id.progress_bar);
+		progress_bar.setVisibility(View.GONE);
+		
+		displayBookmarks();
 	}
 	
 	@Override
