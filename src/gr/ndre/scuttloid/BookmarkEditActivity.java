@@ -68,7 +68,7 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 		String title = field_title.getText().toString();
 		String description = ((EditText)findViewById(R.id.description)).getText().toString(); 
 		String tags = ((EditText)findViewById(R.id.tags)).getText().toString();
-		String status = ((String)((Spinner)findViewById(R.id.status)).getSelectedItem());
+		String status = String.valueOf(((Spinner)findViewById(R.id.status)).getSelectedItemPosition());
 		
 		if (title.trim().equals("")) {
 			field_title.setError(getString(R.string.error_titlerequired));
