@@ -7,10 +7,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -32,15 +35,42 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	 */
 	protected BookmarkContent bookmarks;
 	
+	/**
+	 * Identifier for 'edit' context menu option
+	 */
+	protected static final int MENU_EDIT = 0;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_bookmark_list);
+		ListView list = (ListView)findViewById(android.R.id.list);
+		registerForContextMenu(list);
 		
 		String pref_url = getURL();
 		if (pref_url.equals("")) {
 			startActivity(new Intent(this, SettingsActivity.class));
 		}
+	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		if (v.getId() == android.R.id.list) {
+			menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, R.string.edit);
+		}
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		int position = ((AdapterContextMenuInfo) item.getMenuInfo()).position;
+		switch (item.getItemId()) {
+			case MENU_EDIT:
+				Intent intent = new Intent(this, BookmarkEditActivity.class);
+				intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
+				startActivity(intent);
+				return true;
+		}
+		return super.onContextItemSelected(item);
 	}
 	
 	@Override
