@@ -39,7 +39,7 @@ public class ScuttleAPI implements APITask.Callback {
 	}
 	
 	public static interface UpdateCallback extends Callback {
-		
+		public void onBookmarkUpdated();
 	}
 	
 	protected Callback callback;
@@ -82,8 +82,7 @@ public class ScuttleAPI implements APITask.Callback {
 		// Force bookmark replacement
 		params.add(new BasicNameValuePair("replace", "yes"));
 		task.setData(params);
-		
-		// TODO : add a basic response handler !
+		task.setHandler(new ResultXMLHandler());
 		task.execute();
 	}
 	
@@ -94,6 +93,14 @@ public class ScuttleAPI implements APITask.Callback {
 				BookmarkContent bookmarks = ((BookmarksXMLHandler)handler).getBookmarks();
 				((BookmarksCallback) this.callback).onBookmarksReceived(bookmarks);
 				break;
+			case UPDATE:
+				String code = ((ResultXMLHandler)handler).code;
+				if (code.equals("done")) {
+					((UpdateCallback) this.callback).onBookmarkUpdated();
+				}
+				else {
+					this.callback.onAPIError(code);
+				}
 			default:
 				
 		}
@@ -130,10 +137,10 @@ public class ScuttleAPI implements APITask.Callback {
 				break;
 			default:
 				message = this.callback.getContext().getString(R.string.error_apigeneric);
-				break;
 				//System.out.println(String.valueOf(status));
+				break;
 		}
-		if (message != "") {
+		if (!message.isEmpty()) {
 			this.callback.onAPIError(message);
 		}
 	}

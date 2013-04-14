@@ -18,5 +18,6 @@
         <item>Private</item>
     </string-array>
     <string name="save">Save</string>
+    <string name="bookmark_updated">Bookmark updated!</string>
 
 </resources>

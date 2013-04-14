@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class BookmarkEditActivity extends Activity implements OnClickListener, ScuttleAPI.UpdateCallback {
 
@@ -100,6 +101,12 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 	@Override
 	public Context getContext() {
 		return this;
+	}
+
+	@Override
+	public void onBookmarkUpdated() {
+		Toast.makeText(this, getString(R.string.bookmark_updated), Toast.LENGTH_SHORT).show();
+		finish();
 	}
 
 }
