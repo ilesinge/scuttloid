@@ -35,11 +35,6 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	 */
 	protected BookmarkContent bookmarks;
 	
-	/**
-	 * Identifier for 'edit' context menu option
-	 */
-	protected static final int MENU_EDIT = 0;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,22 +50,24 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		if (v.getId() == android.R.id.list) {
-			menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, R.string.edit);
-		}
+		super.onCreateContextMenu(menu, v, menuInfo);
+
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.list_context_menu, menu);
 	}
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		int position = ((AdapterContextMenuInfo) item.getMenuInfo()).position;
 		switch (item.getItemId()) {
-			case MENU_EDIT:
+			case R.id.edit:
 				Intent intent = new Intent(this, BookmarkEditActivity.class);
 				intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
 				startActivity(intent);
 				return true;
+			default:
+				return super.onContextItemSelected(item);
 		}
-		return super.onContextItemSelected(item);
 	}
 	
 	@Override
