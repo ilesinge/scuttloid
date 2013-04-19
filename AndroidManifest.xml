@@ -41,6 +41,10 @@
             android:name="gr.ndre.scuttloid.BookmarkEditActivity"
             android:label="@string/title_bookmark_edit" >
         </activity>
+        <activity
+            android:name="gr.ndre.scuttloid.BookmarkAddActivity"
+            android:label="@string/title_bookmark_add" >
+        </activity>
     </application>
 
 </manifest>

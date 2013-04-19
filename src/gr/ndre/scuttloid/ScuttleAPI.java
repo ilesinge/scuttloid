@@ -42,6 +42,10 @@ public class ScuttleAPI implements APITask.Callback {
 		public void onBookmarkUpdated();
 	}
 	
+	public static interface CreateCallback extends Callback {
+		
+	}
+	
 	protected Callback callback;
 	
 	/**

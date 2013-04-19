@@ -102,8 +102,12 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.settings:
-				Intent intent = new Intent(this, SettingsActivity.class);
-				startActivity(intent);
+				Intent settings_intent = new Intent(this, SettingsActivity.class);
+				startActivity(settings_intent);
+				return true;
+			case R.id.add:
+				Intent add_intent = new Intent(this, BookmarkAddActivity.class);
+				startActivity(add_intent);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

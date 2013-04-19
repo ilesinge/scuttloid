@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="12dp"
+    android:orientation="vertical">
+	
+	<TextView
+		android:text="@string/url_label"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"/>
+	<EditText
+		android:id="@+id/url"
+		android:inputType="textUri"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"/>
+	<TextView
+		android:text="@string/title_label"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"/>
+	<EditText
+		android:id="@+id/title"
+		android:inputType="text"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
+	<TextView
+		android:text="@string/description_label"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"/>
+	<EditText
+		android:id="@+id/description"
+		android:inputType="text|textMultiLine"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
+	<TextView
+		android:text="@string/tags_label"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"/>
+	<EditText
+		android:id="@+id/tags"
+		android:inputType="text|textNoSuggestions"
+		android:singleLine="true"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"/>
+	<TextView
+		android:text="@string/status_label"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"/>
+	<Spinner 
+		android:id="@+id/status"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:prompt="@string/status_prompt"/>
+	<Button
+		android:id="@+id/save_button"
+		android:text="@string/save"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"/>
+    
+</LinearLayout>

@@ -4,8 +4,10 @@
     <string name="app_name">Scuttloid</string>
     <string name="title_bookmark_detail">Bookmark Detail</string>
     <string name="settings">Settings</string>
+    <string name="add">Add</string>
     <string name="edit">Edit</string>
     <string name="title_bookmark_edit">Edit Bookmark</string>
+    <string name="title_bookmark_add">Add Bookmark</string>
     <string name="url_label">URL:</string>
     <string name="title_label">Title:</string>
     <string name="description_label">Description:</string>
