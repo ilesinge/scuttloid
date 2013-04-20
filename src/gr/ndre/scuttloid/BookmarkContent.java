@@ -60,6 +60,14 @@ public class BookmarkContent {
 		items.add(item);
 		item_map.put(item.url, item);
 	}
+	
+	/**
+	 * Add a bookmark to the top of the collection
+	 */
+	public void addItemToTop(Item item) {
+		items.add(0, item);
+		item_map.put(item.url, item);
+	}
 
 	/**
 	 * A bookmark item representing a piece of content.

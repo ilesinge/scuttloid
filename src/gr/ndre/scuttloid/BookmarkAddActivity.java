@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class BookmarkAddActivity extends Activity implements OnClickListener, ScuttleAPI.CreateCallback {
 
@@ -80,8 +81,8 @@ public class BookmarkAddActivity extends Activity implements OnClickListener, Sc
 			item.status = status;
 			
 			// Save the bookmark
-			//ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
-			//api.createBookmark(item);
+			ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
+			api.createBookmark(item);
 		}
 	}
 	
@@ -100,6 +101,13 @@ public class BookmarkAddActivity extends Activity implements OnClickListener, Sc
 	@Override
 	public Context getContext() {
 		return this;
+	}
+
+	@Override
+	public void onBookmarkCreated() {
+		BookmarkContent.getShared().addItemToTop(item);
+		Toast.makeText(this, getString(R.string.bookmark_created), Toast.LENGTH_SHORT).show();
+		finish();
 	}
 
 }

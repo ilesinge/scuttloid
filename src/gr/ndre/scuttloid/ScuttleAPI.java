@@ -19,6 +19,7 @@ public class ScuttleAPI implements APITask.Callback {
 	
 	protected static final int BOOKMARKS = 0;
 	protected static final int UPDATE = 1;
+	protected static final int CREATE = 2;
 
 	protected String url;
 	protected String username;
@@ -43,7 +44,7 @@ public class ScuttleAPI implements APITask.Callback {
 	}
 	
 	public static interface CreateCallback extends Callback {
-		
+		public void onBookmarkCreated();
 	}
 	
 	protected Callback callback;
@@ -60,29 +61,17 @@ public class ScuttleAPI implements APITask.Callback {
 	
 	public void getBookmarks() {
 		this.handler = BOOKMARKS;
-		APITask task = this.getAPITask();
-		String url = this.getBaseURL();
-		url += "api/posts_all.php";
-		task.setURL(url);
+		APITask task = this.getAPITask("api/posts_all.php");
 		task.setHandler(new BookmarksXMLHandler());
 		task.execute();
 	}
 	
 	public void updateBookmark(BookmarkContent.Item item) {
 		this.handler = UPDATE;
-		APITask task = this.getAPITask();
-		String url = this.getBaseURL();
-		url += "api/posts_add.php";
-		task.setURL(url);
+		APITask task = this.getAPITask("api/posts_add.php");
 		task.setMethod(APITask.METHOD_POST);
-		
 		// Prepare post data
-		List<NameValuePair> params = new ArrayList<NameValuePair>(6);
-		params.add(new BasicNameValuePair("url", item.url));
-		params.add(new BasicNameValuePair("description", item.title));
-		params.add(new BasicNameValuePair("extended", item.description));
-		params.add(new BasicNameValuePair("tags", item.tags));
-		params.add(new BasicNameValuePair("status", item.status));
+		List<NameValuePair> params = this.itemToParams(item);
 		// Force bookmark replacement
 		params.add(new BasicNameValuePair("replace", "yes"));
 		task.setData(params);
@@ -90,33 +79,72 @@ public class ScuttleAPI implements APITask.Callback {
 		task.execute();
 	}
 	
+	public void createBookmark(BookmarkContent.Item item) {
+		this.handler = CREATE;
+		APITask task = this.getAPITask("api/posts_add.php");
+		task.setMethod(APITask.METHOD_POST);
+		
+		// Prepare post data
+		List<NameValuePair> params = this.itemToParams(item);
+		task.setData(params);
+		task.setHandler(new ResultXMLHandler());
+		task.execute();
+	}
+	
 	@Override
 	public void onDataReceived(DefaultHandler handler) {
+		String result_code;
 		switch (this.handler) {
 			case BOOKMARKS:
 				BookmarkContent bookmarks = ((BookmarksXMLHandler)handler).getBookmarks();
 				((BookmarksCallback) this.callback).onBookmarksReceived(bookmarks);
 				break;
 			case UPDATE:
-				String code = ((ResultXMLHandler)handler).code;
-				if (code.equals("done")) {
+				result_code = ((ResultXMLHandler)handler).code;
+				if (result_code.equals("done")) {
 					((UpdateCallback) this.callback).onBookmarkUpdated();
 				}
 				else {
-					this.callback.onAPIError(code);
+					this.callback.onAPIError(result_code);
 				}
+				break;
+			case CREATE:
+				result_code = ((ResultXMLHandler)handler).code;
+				if (result_code.equals("done")) {
+					((CreateCallback) this.callback).onBookmarkCreated();
+				}
+				else {
+					this.callback.onAPIError(result_code);
+				}
+				break;
 			default:
 				
 		}
 	}
 	
-	protected APITask getAPITask() {
+	protected APITask getAPITask(String path) {
 		APITask task = new APITask(this, this.username, this.password);
+		String url = this.buildURL(path);
+		task.setURL(url);
 		return task;
 	}
 	
 	protected String getBaseURL() {
 		return URLUtil.guessUrl(this.url);
+	}
+	
+	protected String buildURL(String path) {
+		return this.getBaseURL() + path;
+	}
+	
+	protected List<NameValuePair> itemToParams(BookmarkContent.Item item) {
+		List<NameValuePair> params = new ArrayList<NameValuePair>(6);
+		params.add(new BasicNameValuePair("url", item.url));
+		params.add(new BasicNameValuePair("description", item.title));
+		params.add(new BasicNameValuePair("extended", item.description));
+		params.add(new BasicNameValuePair("tags", item.tags));
+		params.add(new BasicNameValuePair("status", item.status));
+		return params;
 	}
 
 	@Override
