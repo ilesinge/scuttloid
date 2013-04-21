@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.webkit.URLUtil;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -74,7 +75,7 @@ public class BookmarkAddActivity extends Activity implements OnClickListener, Sc
 		}
 		if (!error) {
 			item = new BookmarkContent.Item();
-			item.url = url;
+			item.url = URLUtil.guessUrl(url);
 			item.title = title;
 			item.description = description;
 			item.tags = tags;
