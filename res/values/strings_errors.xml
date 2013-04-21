@@ -9,5 +9,6 @@
     <string name="error_apigeneric">An error occurred while trying to communicate with the server.</string>
     <string name="error_titlerequired">A title is required</string>
     <string name="error_urlrequired">A URL is required</string>
+    <string name="error_bookmarkexists">This bookmark already exists!</string>
     
 </resources>

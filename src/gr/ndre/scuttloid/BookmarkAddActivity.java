@@ -110,4 +110,9 @@ public class BookmarkAddActivity extends Activity implements OnClickListener, Sc
 		finish();
 	}
 
+	@Override
+	public void onBookmarkExists() {
+		Toast.makeText(this, getString(R.string.error_bookmarkexists), Toast.LENGTH_SHORT).show();
+	}
+
 }

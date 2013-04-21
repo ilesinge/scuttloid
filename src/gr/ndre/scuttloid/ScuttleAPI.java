@@ -2,6 +2,7 @@ package gr.ndre.scuttloid;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -45,6 +46,7 @@ public class ScuttleAPI implements APITask.Callback {
 	
 	public static interface CreateCallback extends Callback {
 		public void onBookmarkCreated();
+		public void onBookmarkExists();
 	}
 	
 	protected Callback callback;
@@ -76,6 +78,8 @@ public class ScuttleAPI implements APITask.Callback {
 		params.add(new BasicNameValuePair("replace", "yes"));
 		task.setData(params);
 		task.setHandler(new ResultXMLHandler());
+		task.addAcceptableStatus(HttpStatus.SC_BAD_REQUEST); // 400 : missing field 
+		task.addAcceptableStatus(HttpStatus.SC_CONFLICT); // 409 : bookmark exists
 		task.execute();
 	}
 	
@@ -88,38 +92,44 @@ public class ScuttleAPI implements APITask.Callback {
 		List<NameValuePair> params = this.itemToParams(item);
 		task.setData(params);
 		task.setHandler(new ResultXMLHandler());
+		task.addAcceptableStatus(HttpStatus.SC_BAD_REQUEST); // 400 : missing field 
+		task.addAcceptableStatus(HttpStatus.SC_CONFLICT); // 409 : bookmark exists
 		task.execute();
 	}
 	
 	@Override
-	public void onDataReceived(DefaultHandler handler) {
-		String result_code;
+	public void onDataReceived(DefaultHandler handler, int status) {
 		switch (this.handler) {
 			case BOOKMARKS:
 				BookmarkContent bookmarks = ((BookmarksXMLHandler)handler).getBookmarks();
 				((BookmarksCallback) this.callback).onBookmarksReceived(bookmarks);
 				break;
 			case UPDATE:
-				result_code = ((ResultXMLHandler)handler).code;
-				if (result_code.equals("done")) {
+				if (status == HttpStatus.SC_OK) {
 					((UpdateCallback) this.callback).onBookmarkUpdated();
 				}
 				else {
-					this.callback.onAPIError(result_code);
+					this.sendResultError(handler);
 				}
 				break;
 			case CREATE:
-				result_code = ((ResultXMLHandler)handler).code;
-				if (result_code.equals("done")) {
+				if (status == HttpStatus.SC_OK) {
 					((CreateCallback) this.callback).onBookmarkCreated();
 				}
+				else if (status == HttpStatus.SC_CONFLICT) {
+					((CreateCallback) this.callback).onBookmarkExists();
+				}
 				else {
-					this.callback.onAPIError(result_code);
+					this.sendResultError(handler);
 				}
 				break;
-			default:
-				
 		}
+	}
+
+	protected void sendResultError(DefaultHandler handler) {
+		String result = ((ResultXMLHandler)handler).code;
+		result = result.substring(0, 1).toUpperCase(Locale.US) + result.substring(1);
+		this.callback.onAPIError(result);
 	}
 	
 	protected APITask getAPITask(String path) {

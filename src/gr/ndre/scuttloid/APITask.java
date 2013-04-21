@@ -1,8 +1,10 @@
 package gr.ndre.scuttloid;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -26,7 +28,7 @@ import android.util.Xml;
 public class APITask extends AsyncTask<Void, Void, Void> {
 
 	public static interface Callback {
-        public void onDataReceived(DefaultHandler handler);
+        public void onDataReceived(DefaultHandler handler, int status);
         public void onError(int status);
     }
 	
@@ -41,6 +43,7 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 	protected int status = 0;
 	protected int method = METHOD_GET;
 	protected List<NameValuePair> data;
+	protected ArrayList<Integer> acceptable_statuses = new ArrayList<Integer>();
 	
 	public static final int GENERIC_ERROR = 1000;
 	public static final int UNKNOWN_HOST = 1001;
@@ -69,44 +72,27 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		this.method = method;
 	}
 	
+	public void addAcceptableStatus(int status) {
+		this.acceptable_statuses.add(status);
+	}
+	
 	@Override
 	protected Void doInBackground(Void... params) {
 		AndroidHttpClient client = AndroidHttpClient.newInstance("gr.ndre.scuttloid");
-		
-		HttpRequestBase request;
-		if (this.method == METHOD_POST) {
-			request = new HttpPost(this.url);
-			if (this.data != null) {
-				try {
-					((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(this.data, HTTP.UTF_8));
-				} catch (UnsupportedEncodingException e) {
-					this.status = GENERIC_ERROR;
-					client.close();
-					return null;
-				}
-			}
-		} else {
-			request = new HttpGet(this.url);
+		HttpRequestBase request = buildRequest();
+		if (request != null) {
+			executeRequest(client, request);
 		}
-		
-		// Add Basic Authentication header
-		String authentication = username+":"+password;
-		String encodedAuthentication = Base64.encodeToString(authentication.getBytes(), Base64.NO_WRAP);
-		request.addHeader("Authorization", "Basic " + encodedAuthentication);
-		
+		client.close();
+		return null;
+	}
+
+	protected void executeRequest(AndroidHttpClient client, HttpRequestBase request) {
 		try {
 			HttpResponse response = client.execute(request);
-			int status = response.getStatusLine().getStatusCode();
-			if (status >= 300) {
-				this.status = status;
-				System.out.println(status);
-				// TODO : parse eventual error message !
-				client.close();
-				return null;
-			}
-			if (this.handler != null) {
-				InputStream content = response.getEntity().getContent();
-				Xml.parse(content, Xml.Encoding.UTF_8, this.handler);
+			this.status = response.getStatusLine().getStatusCode();
+			if (!this.isError(this.status)) {
+				this.parseResponse(response);
 			}
 		}
 		catch (UnknownHostException e) {
@@ -122,18 +108,56 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 			this.status = GENERIC_ERROR;
 			//System.out.println(e.getClass().getName());
 		}
-		client.close();
-		return null;
+	}
+	
+	protected boolean isError(int status) {
+		return (status >= 300 & !acceptable_statuses.contains(status));
+	}
+
+	protected HttpRequestBase buildRequest() {
+		HttpRequestBase request;
+		if (this.method == METHOD_POST) {
+			request = new HttpPost(this.url);
+			if (this.data != null) {
+				try {
+					UrlEncodedFormEntity entity = new UrlEncodedFormEntity(this.data, HTTP.UTF_8);
+					((HttpEntityEnclosingRequestBase) request).setEntity(entity);
+				} catch (UnsupportedEncodingException e) {
+					this.status = GENERIC_ERROR;
+					return null;
+				}
+			}
+		} else {
+			request = new HttpGet(this.url);
+		}
+		
+		// Add Basic Authentication header
+		this.addAuthHeader(request);
+		
+		return request;
+	}
+
+	protected void parseResponse(HttpResponse response) throws IOException, SAXException {
+		if (this.handler != null) {
+			InputStream content = response.getEntity().getContent();
+			Xml.parse(content, Xml.Encoding.UTF_8, this.handler);
+		}
 	}
 	
 	public void onPostExecute(Void param)
 	{
-		if (this.status > 0) {
+		if (this.isError(this.status)) {
 			this.callback.onError(this.status);
 		}
 		else {
-			this.callback.onDataReceived(this.handler);
+			this.callback.onDataReceived(this.handler, this.status);
 		}
+	}
+	
+	protected void addAuthHeader(HttpRequestBase request) {
+		String authentication = username+":"+password;
+		String encodedAuthentication = Base64.encodeToString(authentication.getBytes(), Base64.NO_WRAP);
+		request.addHeader("Authorization", "Basic " + encodedAuthentication);
 	}
 
 }
