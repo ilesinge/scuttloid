@@ -3,6 +3,7 @@ package gr.ndre.scuttloid;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -75,7 +76,11 @@ public class BookmarkAddActivity extends Activity implements OnClickListener, Sc
 		}
 		if (!error) {
 			item = new BookmarkContent.Item();
-			item.url = URLUtil.guessUrl(url);
+			String fixed_url = URLUtil.guessUrl(url);
+			if (fixed_url.endsWith("/")) {
+				fixed_url = fixed_url.substring(0, fixed_url.length() - 1);
+			}
+			item.url = fixed_url;
 			item.title = title;
 			item.description = description;
 			item.tags = tags;
@@ -114,6 +119,14 @@ public class BookmarkAddActivity extends Activity implements OnClickListener, Sc
 	@Override
 	public void onBookmarkExists() {
 		Toast.makeText(this, getString(R.string.error_bookmarkexists), Toast.LENGTH_SHORT).show();
+		
+		Integer position = BookmarkContent.getShared().getPosition(item.url);
+		if (position != -1) {
+			Intent intent = new Intent(this, BookmarkEditActivity.class);
+			intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
+			startActivity(intent);
+			finish();
+		}
 	}
 
 }

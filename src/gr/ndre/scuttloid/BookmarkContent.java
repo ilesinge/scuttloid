@@ -68,6 +68,14 @@ public class BookmarkContent {
 		items.add(0, item);
 		item_map.put(item.url, item);
 	}
+	
+	public int getPosition(String url) {
+		Item item = item_map.get(url);
+		if (item != null) {
+			return items.indexOf(item);
+		}
+		return -1;
+	}
 
 	/**
 	 * A bookmark item representing a piece of content.
