@@ -17,7 +17,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class BookmarkAddActivity extends Activity implements OnClickListener, ScuttleAPI.CreateCallback {
+public class BookmarkAddActivity extends Activity
+	implements OnClickListener, ScuttleAPI.CreateCallback, ScuttleAPI.BookmarksCallback {
 
 	/**
 	 * The bookmark content this activity is editing.
@@ -39,6 +40,16 @@ public class BookmarkAddActivity extends Activity implements OnClickListener, Sc
 				android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
+		
+		// Get the extras data passed in with the intent.
+		Bundle extras = this.getIntent().getExtras();
+		if (extras != null) {
+			// Set the text fields to the values of the passed in data.
+			EditText url_field = (EditText)findViewById(R.id.url);
+			url_field.setText(extras.getCharSequence(Intent.EXTRA_TEXT));
+			EditText title_field = (EditText)findViewById(R.id.title);
+			title_field.setText(extras.getString(Intent.EXTRA_SUBJECT));
+		}
 		
 		// Handle when the user presses the save button.
 		Button btnSave = (Button)findViewById(R.id.save_button);
@@ -118,8 +129,18 @@ public class BookmarkAddActivity extends Activity implements OnClickListener, Sc
 
 	@Override
 	public void onBookmarkExists() {
-		Toast.makeText(this, getString(R.string.error_bookmarkexists), Toast.LENGTH_SHORT).show();
-		
+		BookmarkContent bookmarks = BookmarkContent.getShared();
+		if (bookmarks == null) {
+			// No bookmarks are available, probably coming from SHARE intent.
+			this.retrieveBookmarks();
+		}
+		else {
+			Toast.makeText(this, getString(R.string.error_bookmarkexists), Toast.LENGTH_SHORT).show();
+			this.sendToEdit();
+		}
+	}
+
+	protected void sendToEdit() {
 		Integer position = BookmarkContent.getShared().getPosition(item.url);
 		if (position != -1) {
 			Intent intent = new Intent(this, BookmarkEditActivity.class);
@@ -127,6 +148,25 @@ public class BookmarkAddActivity extends Activity implements OnClickListener, Sc
 			startActivity(intent);
 			finish();
 		}
+	}
+
+	protected void retrieveBookmarks() {
+		// Display the progress bar
+		View form = findViewById(R.id.form);
+		form.setVisibility(View.GONE);
+		View progress_bar = findViewById(R.id.progress_bar);
+		progress_bar.setVisibility(View.VISIBLE);
+		
+		Toast.makeText(this, getString(R.string.error_bookmarkexists_retrieving), Toast.LENGTH_LONG).show();
+		
+		ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
+		api.getBookmarks();
+	}
+	
+	@Override
+	public void onBookmarksReceived(BookmarkContent bookmarks) {
+		BookmarkContent.setShared(bookmarks);
+		this.sendToEdit();
 	}
 
 }

@@ -10,5 +10,6 @@
     <string name="error_titlerequired">A title is required</string>
     <string name="error_urlrequired">A URL is required</string>
     <string name="error_bookmarkexists">This bookmark already exists!</string>
+    <string name="error_bookmarkexists_retrieving">This bookmark already exists. Retrieving the original bookmark to let you edit it.</string>
     
 </resources>

@@ -40,6 +40,11 @@
         <activity
             android:name="gr.ndre.scuttloid.BookmarkAddActivity"
             android:label="@string/title_bookmark_add" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<data android:mimeType="text/plain"/>
+            </intent-filter>
         </activity>
     </application>
 

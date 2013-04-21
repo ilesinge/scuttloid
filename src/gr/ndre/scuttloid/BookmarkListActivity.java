@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 /**
  * An activity representing a list of Bookmarks. The activity
@@ -126,7 +125,7 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	
 	protected void loadBookmarks() {
 		// Ensure the progress bar is visible
-		ProgressBar progress_bar = (ProgressBar) findViewById(R.id.progress_bar);
+		View progress_bar = findViewById(R.id.progress_bar);
 		progress_bar.setVisibility(View.VISIBLE);
 		
 		// Get the bookmarks
@@ -150,7 +149,7 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		BookmarkContent.setShared(bookmarks);
 		
 		// Remove the progress bar
-		ProgressBar progress_bar = (ProgressBar) findViewById(R.id.progress_bar);
+		View progress_bar = findViewById(R.id.progress_bar);
 		progress_bar.setVisibility(View.GONE);
 		
 		displayBookmarks();
