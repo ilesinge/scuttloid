@@ -27,11 +27,7 @@
         </activity>
         <activity
             android:name="gr.ndre.scuttloid.BookmarkDetailActivity"
-            android:label="@string/title_bookmark_detail"
-            android:parentActivityName=".BookmarkListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".BookmarkListActivity" />
+            android:label="@string/title_bookmark_detail" >
         </activity>
         <activity
             android:name="gr.ndre.scuttloid.SettingsActivity"
