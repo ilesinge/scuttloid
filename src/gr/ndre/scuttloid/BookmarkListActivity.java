@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
@@ -56,16 +57,36 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	}
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		int position = ((AdapterContextMenuInfo) item.getMenuInfo()).position;
-		switch (item.getItemId()) {
+	public boolean onContextItemSelected(MenuItem menu_item) {
+		int position = ((AdapterContextMenuInfo) menu_item.getMenuInfo()).position;
+		BookmarkContent.Item item;
+		Intent intent;
+		switch (menu_item.getItemId()) {
 			case R.id.edit:
-				Intent intent = new Intent(this, BookmarkEditActivity.class);
+				intent = new Intent(this, BookmarkEditActivity.class);
 				intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
 				startActivity(intent);
 				return true;
+			case R.id.details:
+				intent = new Intent(this, BookmarkDetailActivity.class);
+				intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
+				startActivity(intent);
+				return true;
+			case R.id.open:
+				item = this.bookmarks.getItem(position);
+				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.url));
+	    		startActivity(intent);
+	    		return true;
+			case R.id.share:
+				item = this.bookmarks.getItem(position);
+				intent = new Intent(android.content.Intent.ACTION_SEND);
+				intent.setType("text/plain");
+				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, item.title);
+				intent.putExtra(android.content.Intent.EXTRA_TEXT, item.url);
+	    		startActivity(Intent.createChooser(intent, getString(R.string.share_via)));
+    	    	return true;
 			default:
-				return super.onContextItemSelected(item);
+				return super.onContextItemSelected(menu_item);
 		}
 	}
 	
@@ -118,9 +139,9 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		super.onListItemClick(listView, view, position, id);
 
 		// Start the detail activity for the selected item.
-		Intent detailIntent = new Intent(this, BookmarkDetailActivity.class);
-		detailIntent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
-		startActivity(detailIntent);
+		Intent detail_intent = new Intent(this, BookmarkDetailActivity.class);
+		detail_intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
+		startActivity(detail_intent);
 	}
 	
 	protected void loadBookmarks() {

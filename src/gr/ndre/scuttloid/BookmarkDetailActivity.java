@@ -2,6 +2,7 @@ package gr.ndre.scuttloid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -84,8 +85,8 @@ public class BookmarkDetailActivity extends Activity {
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
+	public boolean onOptionsItemSelected(MenuItem menu_item) {
+		switch (menu_item.getItemId()) {
 			case android.R.id.home:
 				finish();
 				return true;
@@ -94,7 +95,18 @@ public class BookmarkDetailActivity extends Activity {
 				intent.putExtra(ARG_ITEM_POS, getIntent().getIntExtra(ARG_ITEM_POS, 0));
 				startActivity(intent);
 				return true;
+			case R.id.open:
+				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.url));
+	    		startActivity(intent);
+	    		return true;
+			case R.id.share:
+				intent = new Intent(android.content.Intent.ACTION_SEND);
+				intent.setType("text/plain");
+				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, item.title);
+				intent.putExtra(android.content.Intent.EXTRA_TEXT, item.url);
+	    		startActivity(Intent.createChooser(intent, getString(R.string.share_via)));
+    	    	return true;
 		}
-		return super.onOptionsItemSelected(item);
+		return super.onOptionsItemSelected(menu_item);
 	}
 }
