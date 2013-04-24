@@ -11,5 +11,5 @@
     <string name="error_urlrequired">A URL is required</string>
     <string name="error_bookmarkexists">This bookmark already exists!</string>
     <string name="error_bookmarkexists_retrieving">This bookmark already exists. Retrieving the original bookmark to let you edit it.</string>
-    
+    <string name="error_bookmarkdelete_notfound">This bookmark was not found on the server, it may have been already deleted.</string>
 </resources>

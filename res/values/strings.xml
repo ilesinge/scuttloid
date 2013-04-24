@@ -22,9 +22,12 @@
     <string name="save">Save</string>
     <string name="bookmark_updated">Bookmark updated!</string>
     <string name="bookmark_created">Bookmark added!</string>
+    <string name="bookmark_deleted">Bookmark deleted!</string>
     <string name="details">Show details</string>
     <string name="open">Open</string>
     <string name="share">Share</string>
     <string name="share_via">Share with</string>
-
+    <string name="delete">Delete</string>
+    <string name="delete_bookmark">Delete Bookmark</string>
+    <string name="delete_confirm">Are you sure you want to delete the bookmark \"%1$s\"?</string>
 </resources>

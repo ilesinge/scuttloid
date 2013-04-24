@@ -21,6 +21,7 @@ public class ScuttleAPI implements APITask.Callback {
 	protected static final int BOOKMARKS = 0;
 	protected static final int UPDATE = 1;
 	protected static final int CREATE = 2;
+	protected static final int DELETE = 3;
 
 	protected String url;
 	protected String username;
@@ -47,6 +48,10 @@ public class ScuttleAPI implements APITask.Callback {
 	public static interface CreateCallback extends Callback {
 		public void onBookmarkCreated();
 		public void onBookmarkExists();
+	}
+	
+	public static interface DeleteCallback extends Callback {
+		public void onBookmarkDeleted();
 	}
 	
 	protected Callback callback;
@@ -97,6 +102,18 @@ public class ScuttleAPI implements APITask.Callback {
 		task.execute();
 	}
 	
+	public void deleteBookmark(BookmarkContent.Item item) {
+		this.handler = DELETE;
+		APITask task = this.getAPITask("api/posts_delete.php");
+		task.setMethod(APITask.METHOD_POST);
+		List<NameValuePair> params = new ArrayList<NameValuePair>(1);
+		params.add(new BasicNameValuePair("url", item.url));
+		task.setData(params);
+		task.setHandler(new ResultXMLHandler());
+		task.addAcceptableStatus(HttpStatus.SC_NOT_FOUND); // 404 : bookmark doesn't exist
+		task.execute();
+	}
+	
 	@Override
 	public void onDataReceived(DefaultHandler handler, int status) {
 		switch (this.handler) {
@@ -118,6 +135,17 @@ public class ScuttleAPI implements APITask.Callback {
 				}
 				else if (status == HttpStatus.SC_CONFLICT) {
 					((CreateCallback) this.callback).onBookmarkExists();
+				}
+				else {
+					this.sendResultError(handler);
+				}
+				break;
+			case DELETE:
+				if (status == HttpStatus.SC_OK) {
+					((DeleteCallback) this.callback).onBookmarkDeleted();
+				}
+				else if (status == HttpStatus.SC_NOT_FOUND) {
+					this.callback.onAPIError(this.callback.getContext().getString(R.string.error_bookmarkdelete_notfound));
 				}
 				else {
 					this.sendResultError(handler);
