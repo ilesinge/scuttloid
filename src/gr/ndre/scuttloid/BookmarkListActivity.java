@@ -1,8 +1,10 @@
 package gr.ndre.scuttloid;
 
+import gr.ndre.scuttloid.BookmarkContent.Item;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
+import android.widget.Toast;
 
 /**
  * An activity representing a list of Bookmarks. The activity
@@ -28,12 +31,18 @@ import android.widget.ListView;
  * {@link BookmarkListFragment.Callback} interface to listen for item
  * selections.
  */
-public class BookmarkListActivity extends ListActivity implements ScuttleAPI.BookmarksCallback {
+public class BookmarkListActivity extends ListActivity implements ScuttleAPI.BookmarksCallback,
+	ScuttleAPI.DeleteCallback {
 
 	/**
 	 * Container for all bookmarks
 	 */
 	protected BookmarkContent bookmarks;
+	
+	/**
+	 * Container for bookmark being deleted
+	 */
+	protected BookmarkContent.Item bookmark_to_delete;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +68,7 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	@Override
 	public boolean onContextItemSelected(MenuItem menu_item) {
 		int position = ((AdapterContextMenuInfo) menu_item.getMenuInfo()).position;
-		BookmarkContent.Item item;
+		final BookmarkContent.Item item;
 		Intent intent;
 		switch (menu_item.getItemId()) {
 			case R.id.edit:
@@ -85,11 +94,34 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 				intent.putExtra(android.content.Intent.EXTRA_TEXT, item.url);
 	    		startActivity(Intent.createChooser(intent, getString(R.string.share_via)));
     	    	return true;
+			case R.id.delete:
+				item = this.bookmarks.getItem(position);
+				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				        if (which == DialogInterface.BUTTON_POSITIVE) {
+				            BookmarkListActivity.this.onDeleteConfirmed(item);
+				        }
+				    }
+				};
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.delete_bookmark);
+				builder.setMessage(getString(R.string.delete_confirm, item.title));
+				builder.setPositiveButton(android.R.string.yes, dialogClickListener);
+				builder.setNegativeButton(android.R.string.no, dialogClickListener);
+				builder.show();
+				return true;
 			default:
 				return super.onContextItemSelected(menu_item);
 		}
 	}
 	
+	protected void onDeleteConfirmed(Item item) {
+		this.bookmark_to_delete = item;
+		ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
+		api.deleteBookmark(item);
+	}
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -173,6 +205,14 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		View progress_bar = findViewById(R.id.progress_bar);
 		progress_bar.setVisibility(View.GONE);
 		
+		displayBookmarks();
+	}
+	
+	@Override
+	public void onBookmarkDeleted() {
+		BookmarkContent.getShared().removeItem(this.bookmark_to_delete.url);
+		Toast.makeText(this, getString(R.string.bookmark_deleted), Toast.LENGTH_SHORT).show();
+		bookmarks = BookmarkContent.getShared();
 		displayBookmarks();
 	}
 	
