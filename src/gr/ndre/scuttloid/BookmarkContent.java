@@ -37,6 +37,15 @@ public class BookmarkContent {
 	}
 	
 	/**
+	 * Remove item by URL
+	 */
+	public void removeItem(String url) {
+		int position = this.getPosition(url);
+		this.item_map.remove(url);
+		this.items.remove(position);
+	}
+	
+	/**
 	 * Get item list
 	 */
 	public ArrayList<Item> getItems() {

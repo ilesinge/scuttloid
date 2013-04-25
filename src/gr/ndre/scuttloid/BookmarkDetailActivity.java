@@ -139,6 +139,7 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 	
 	@Override
 	public void onBookmarkDeleted() {
+		BookmarkContent.getShared().removeItem(item.url);
 		Toast.makeText(this, getString(R.string.bookmark_deleted), Toast.LENGTH_SHORT).show();
 		finish();
 	}
