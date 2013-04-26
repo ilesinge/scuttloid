@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/open" android:title="@string/open" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/share" android:title="@string/share" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/edit" android:title="@string/edit" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/delete" android:title="@string/delete" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/open" android:title="@string/open" android:showAsAction="ifRoom" android:icon="@drawable/ic_action_open"></item>
+    <item android:id="@+id/share" android:title="@string/share" android:showAsAction="ifRoom" android:icon="@drawable/ic_action_share"></item>
+    <item android:id="@+id/edit" android:title="@string/edit" android:showAsAction="ifRoom" android:icon="@drawable/ic_action_edit"></item>
+    <item android:id="@+id/delete" android:title="@string/delete" android:showAsAction="ifRoom" android:icon="@drawable/ic_action_delete"></item>
 </menu>
