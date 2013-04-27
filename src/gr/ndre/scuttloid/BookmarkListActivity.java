@@ -3,6 +3,7 @@ package gr.ndre.scuttloid;
 import gr.ndre.scuttloid.BookmarkContent.Item;
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 /**
@@ -54,6 +56,38 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		String pref_url = getURL();
 		if (pref_url.equals("")) {
 			startActivity(new Intent(this, SettingsActivity.class));
+		}
+		
+		handleIntent(getIntent());
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		// TODO : verify that the bookmarks are not reloaded on orientation change
+		String pref_url = getURL();
+		if (!pref_url.equals("") && !(bookmarks instanceof BookmarkContent)) {
+			loadBookmarks();
+		}
+		if (bookmarks instanceof BookmarkContent) {
+			bookmarks = BookmarkContent.getShared();
+			displayBookmarks();
+		}
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		handleIntent(intent);
+	}
+	
+	private void handleIntent(Intent intent) {
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			// handles a search query
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			AlertDialog alert = new AlertDialog.Builder(this).create();
+			alert.setMessage(query);  
+			alert.show();
 		}
 	}
 	
@@ -121,22 +155,7 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
 		api.deleteBookmark(item);
 	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		
-		// TODO : verify that the bookmarks are not reloaded on orientation change
-		String pref_url = getURL();
-		if (!pref_url.equals("") && !(bookmarks instanceof BookmarkContent)) {
-			loadBookmarks();
-		}
-		if (bookmarks instanceof BookmarkContent) {
-			bookmarks = BookmarkContent.getShared();
-			displayBookmarks();
-		}
-	}
-
+	
 	/**
 	 * Display option menu
 	 */
@@ -144,6 +163,12 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.main_menu, menu);
+	    
+	    // Get the SearchView and set the searchable configuration
+	    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+	    SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+	    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+	    searchView.setSubmitButtonEnabled(true);
 	    return true;
 	}
 	

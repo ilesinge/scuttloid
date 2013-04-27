@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_search" android:title="@string/search" android:icon="@drawable/ic_action_search" android:showAsAction="ifRoom|collapseActionView" android:actionViewClass="android.widget.SearchView" />
     <item android:id="@+id/add" android:title="@string/add" android:showAsAction="ifRoom" android:icon="@drawable/ic_action_add"></item>
     <item android:id="@+id/settings" android:title="@string/settings" android:showAsAction="ifRoom" android:icon="@drawable/ic_action_settings"></item>
 </menu>

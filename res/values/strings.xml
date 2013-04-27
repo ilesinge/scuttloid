@@ -30,4 +30,5 @@
     <string name="delete">Delete</string>
     <string name="delete_bookmark">Delete Bookmark</string>
     <string name="delete_confirm">Are you sure you want to delete the bookmark \"%1$s\"?</string>
+    <string name="search">Search</string>
 </resources>
