@@ -106,7 +106,7 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 
 	@Override
 	public void onBookmarkUpdated() {
-		BookmarkContent.getShared().addItem(item);
+		BookmarkContent.getShared().addItemToTop(item);
 		Toast.makeText(this, getString(R.string.bookmark_updated), Toast.LENGTH_SHORT).show();
 		finish();
 	}
