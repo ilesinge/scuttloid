@@ -71,12 +71,13 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 	}
 	
 	protected void setTextOrRemove(int id, String value) {
+		TextView view = (TextView) findViewById(id);
 		if (value != null && !value.isEmpty()) {
-			((TextView) findViewById(id)).setText(value);
+			view.setText(value);
+			view.setVisibility(View.VISIBLE);
 		}
 		else {
-			View view = findViewById(id);
-			((LinearLayout)view.getParent()).removeView(view);
+			view.setVisibility(View.GONE);
 		}
 	}
 	

@@ -59,17 +59,18 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item> impl
 			view = inflater.inflate(R.layout.bookmark_list_item, null);
 		}
 
-		BookmarkContent.Item item = this.bookmarks.get(position);
+		BookmarkContent.Item item = this.getItem(position);
 
 		if (item != null) {
 			((TextView)view.findViewById(R.id.title)).setText(item.title);
 			String tags = item.getCSVTags();
+			TextView tags_view = (TextView) view.findViewById(R.id.tags);
 			if (!tags.isEmpty()) {
-				((TextView)view.findViewById(R.id.tags)).setText(item.getCSVTags());
+				tags_view.setText(item.getCSVTags());
+				tags_view.setVisibility(View.VISIBLE);
 			}
 			else {
-				View tags_view = view.findViewById(R.id.tags);
-				((LinearLayout)tags_view.getParent()).removeView(tags_view);
+				tags_view.setVisibility(View.GONE);
 			}
 		}
 
