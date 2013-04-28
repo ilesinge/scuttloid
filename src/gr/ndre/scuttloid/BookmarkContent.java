@@ -49,7 +49,7 @@ public class BookmarkContent {
 	 * Get item list
 	 */
 	public ArrayList<Item> getItems() {
-		return items;
+		return new ArrayList<Item>(items);
 	}
 	
 	/**
@@ -66,6 +66,7 @@ public class BookmarkContent {
 	 * Add a bookmark to the collection.
 	 */
 	public void addItem(Item item) {
+		items.remove(item);
 		items.add(item);
 		item_map.put(item.url, item);
 	}
@@ -74,6 +75,7 @@ public class BookmarkContent {
 	 * Add a bookmark to the top of the collection
 	 */
 	public void addItemToTop(Item item) {
+		items.remove(item);
 		items.add(0, item);
 		item_map.put(item.url, item);
 	}

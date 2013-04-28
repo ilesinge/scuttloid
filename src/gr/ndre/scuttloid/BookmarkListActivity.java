@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -46,19 +47,24 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	 */
 	protected BookmarkContent.Item bookmark_to_delete;
 	
+	protected BookmarkListAdapter adapter;
+	
+	protected String search_query = "";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_bookmark_list);
-		ListView list = (ListView)findViewById(android.R.id.list);
+		ListView list = getListView();
 		registerForContextMenu(list);
+		list.setTextFilterEnabled(true);
 		
 		String pref_url = getURL();
 		if (pref_url.equals("")) {
 			startActivity(new Intent(this, SettingsActivity.class));
 		}
 		
-		handleIntent(getIntent());
+		handleIntent();
 	}
 	
 	@Override
@@ -70,6 +76,7 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		if (!pref_url.equals("") && !(bookmarks instanceof BookmarkContent)) {
 			loadBookmarks();
 		}
+		// Reload bookmarks if we are not showing search results
 		if (bookmarks instanceof BookmarkContent) {
 			bookmarks = BookmarkContent.getShared();
 			displayBookmarks();
@@ -78,16 +85,15 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-		handleIntent(intent);
+		super.onNewIntent(intent);
+		setIntent(intent);
+		handleIntent();
 	}
 	
-	private void handleIntent(Intent intent) {
-		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+	protected void handleIntent() {
+		if (Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
 			// handles a search query
-			String query = intent.getStringExtra(SearchManager.QUERY);
-			AlertDialog alert = new AlertDialog.Builder(this).create();
-			alert.setMessage(query);  
-			alert.show();
+			search_query = getIntent().getStringExtra(SearchManager.QUERY);
 		}
 	}
 	
@@ -103,16 +109,17 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	public boolean onContextItemSelected(MenuItem menu_item) {
 		int position = ((AdapterContextMenuInfo) menu_item.getMenuInfo()).position;
 		final BookmarkContent.Item item;
+		int shared_position = BookmarkContent.getShared().getPosition(adapter.getItem(position).url);
 		Intent intent;
 		switch (menu_item.getItemId()) {
 			case R.id.edit:
 				intent = new Intent(this, BookmarkEditActivity.class);
-				intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
+				intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, shared_position);
 				startActivity(intent);
 				return true;
 			case R.id.details:
 				intent = new Intent(this, BookmarkDetailActivity.class);
-				intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
+				intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, shared_position);
 				startActivity(intent);
 				return true;
 			case R.id.open:
@@ -169,6 +176,21 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	    SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
 	    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 	    searchView.setSubmitButtonEnabled(true);
+	    // Add live search capability
+	    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				if (adapter != null) {
+					adapter.getFilter().filter(newText);
+				}
+				search_query = newText;
+				return true;
+			}
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				return false;
+			}
+	    });
 	    return true;
 	}
 	
@@ -197,7 +219,8 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 
 		// Start the detail activity for the selected item.
 		Intent detail_intent = new Intent(this, BookmarkDetailActivity.class);
-		detail_intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);
+		int shared_position = BookmarkContent.getShared().getPosition(adapter.getItem(position).url);
+		detail_intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, shared_position);
 		startActivity(detail_intent);
 	}
 	
@@ -213,12 +236,25 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	
 	protected void displayBookmarks() {
 		// Set the list adapter
-		BookmarkListAdapter adapter = new BookmarkListAdapter(
+		adapter = new BookmarkListAdapter(
 				this,
 				R.id.title,
 				this.bookmarks.getItems()
 		);
-		setListAdapter(adapter);
+		
+		// Delay the display if there is a search term
+		if (!search_query.isEmpty()) {
+			adapter.getFilter().filter(search_query);
+			adapter.registerDataSetObserver(new DataSetObserver(){
+				public void onChanged() {
+					setListAdapter(adapter);
+				}
+			});
+		}
+		// Display now otherwise
+		else {
+			setListAdapter(adapter);
+		}
 	}
 	
 	@Override
