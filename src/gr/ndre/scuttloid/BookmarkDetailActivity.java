@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +50,7 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
-		position = getIntent().getIntExtra(ARG_ITEM_POS, 0);
+		this.position = getIntent().getIntExtra(ARG_ITEM_POS, 0);
 	}
 	
 	@Override
@@ -61,23 +60,23 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 	}
 	
 	protected void displayBookmark() {
-		this.item = BookmarkContent.getShared().getItem(position);
+		this.item = BookmarkContent.getShared().getItem(this.position);
 		if (this.item != null) {
-			((TextView) findViewById(R.id.title)).setText(item.title);
-			this.setTextOrRemove(R.id.description, item.description);
-			this.setTextOrRemove(R.id.tags, item.getCSVTags());
-			((TextView) findViewById(R.id.url)).setText(item.url);
+			((TextView) findViewById(R.id.title)).setText(this.item.title);
+			this.setTextOrRemove(R.id.description, this.item.description);
+			this.setTextOrRemove(R.id.tags, this.item.getCSVTags());
+			((TextView) findViewById(R.id.url)).setText(this.item.url);
 		}
 	}
 	
-	protected void setTextOrRemove(int id, String value) {
-		TextView view = (TextView) findViewById(id);
-		if (value != null && !value.isEmpty()) {
-			view.setText(value);
-			view.setVisibility(View.VISIBLE);
+	protected void setTextOrRemove(int view_id, String value) {
+		TextView view = (TextView) findViewById(view_id);
+		if (value == null || value.isEmpty()) {
+			view.setVisibility(View.GONE);
 		}
 		else {
-			view.setVisibility(View.GONE);
+			view.setText(value);
+			view.setVisibility(View.VISIBLE);
 		}
 	}
 	
@@ -103,14 +102,14 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 				startActivity(intent);
 				return true;
 			case R.id.open:
-				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.url));
+				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(this.item.url));
 	    		startActivity(intent);
 	    		return true;
 			case R.id.share:
 				intent = new Intent(android.content.Intent.ACTION_SEND);
 				intent.setType("text/plain");
-				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, item.title);
-				intent.putExtra(android.content.Intent.EXTRA_TEXT, item.url);
+				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, this.item.title);
+				intent.putExtra(android.content.Intent.EXTRA_TEXT, this.item.url);
 	    		startActivity(Intent.createChooser(intent, getString(R.string.share_via)));
     	    	return true;
 			case R.id.delete:
@@ -124,30 +123,30 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 				};
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.delete_bookmark);
-				builder.setMessage(getString(R.string.delete_confirm, item.title));
+				builder.setMessage(getString(R.string.delete_confirm, this.item.title));
 				builder.setPositiveButton(android.R.string.yes, dialogClickListener);
 				builder.setNegativeButton(android.R.string.no, dialogClickListener);
 				builder.show();
 				return true;
+			default:
+				return super.onOptionsItemSelected(menu_item);
 		}
-		return super.onOptionsItemSelected(menu_item);
 	}
 
 	protected void onDeleteConfirmed() {
 		ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
-		api.deleteBookmark(item);
+		api.deleteBookmark(this.item);
 	}
 	
 	@Override
 	public void onBookmarkDeleted() {
-		BookmarkContent.getShared().removeItem(item.url);
+		BookmarkContent.getShared().removeItem(this.item.url);
 		Toast.makeText(this, getString(R.string.bookmark_deleted), Toast.LENGTH_SHORT).show();
 		finish();
 	}
 	
 	protected SharedPreferences getGlobalPreferences() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
-		return preferences;
+		return PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
 	}
 
 	@Override

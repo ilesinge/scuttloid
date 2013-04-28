@@ -15,7 +15,7 @@ public class BookmarksXMLHandler extends DefaultHandler {
 	
 	@Override
 	public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
-		if (localName.equalsIgnoreCase("post")) {
+		if ("post".equalsIgnoreCase(localName)) {
 			BookmarkContent.Item bookmark = new BookmarkContent.Item();
 			bookmark.url = attributes.getValue("href");
 			bookmark.title = attributes.getValue("description");

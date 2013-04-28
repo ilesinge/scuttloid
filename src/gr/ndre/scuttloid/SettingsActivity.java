@@ -15,36 +15,7 @@ import android.text.InputType;
  */
 public class SettingsActivity extends PreferenceActivity {
 	
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Display the fragment as the main content.
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new SettingsFragment())
-                .commit();
-    }
-
-    public static class SettingsFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-
-            // Load the preferences from an XML resource
-            addPreferencesFromResource(R.xml.settings);
-            
-            // Bind the summaries of EditText/List/Dialog preferences
- 			// to their values. When their values change, their summaries are
- 			// updated to reflect the new value, per the Android Design
- 			// guidelines.
-            bindPreferenceSummaryToValue(findPreference("url"));
-            bindPreferenceSummaryToValue(findPreference("username"));
-            bindPreferenceSummaryToValue(findPreference("password"));
-        }
-    }
-    
-    /**
+	/**
 	 * A preference value change listener that updates the preference's summary
 	 * to reflect its new value.
 	 */
@@ -52,26 +23,34 @@ public class SettingsActivity extends PreferenceActivity {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object value) {
 			String stringValue = value.toString();
-			if (!stringValue.isEmpty()) {
+			if (stringValue.isEmpty()) {
+				// Put back the default summary
+				preference.setSummary((CharSequence) preference.getExtras().get("default_summary"));
+			}
+			else {
 				if (preference instanceof ListPreference) {
 					// For list preferences, look up the correct display value in
 					// the preference's 'entries' list.
 					ListPreference listPreference = (ListPreference) preference;
 					int index = listPreference.findIndexOfValue(stringValue);
 	
+					CharSequence summary = null;
 					// Set the summary to reflect the new value.
-					preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
+					if (index >= 0) {
+						summary = listPreference.getEntries()[index];
+					}
+					preference.setSummary(summary);
 				}
 				else if (preference instanceof EditTextPreference) {
 					// For passwords, display dots as summary
 					int type = ((EditTextPreference) preference).getEditText().getInputType();
 					if (type == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
 						int length = stringValue.length();
-						StringBuilder sb = new StringBuilder(length);
-					    for (int i=0; i<length; i++ ) {
-					        sb.append("●"); 
+						StringBuilder string_builder = new StringBuilder(length);
+					    for (int i = 0; i < length; i++) {
+					    	string_builder.append("●"); 
 					    }
-						preference.setSummary(sb.toString());
+						preference.setSummary(string_builder.toString());
 					}
 					// For other types, just set the value as summary
 					else {
@@ -84,13 +63,19 @@ public class SettingsActivity extends PreferenceActivity {
 					preference.setSummary(stringValue);
 				}
 			}
-			else {
-				// Put back the default summary
-				preference.setSummary((CharSequence)preference.getExtras().get("default_summary"));
-			}
 			return true;
 		}
 	};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Display the fragment as the main content.
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, new SettingsFragment())
+                .commit();
+    }
 	
 	/**
 	 * Binds a preference's summary to its value. More specifically, when the
@@ -116,5 +101,23 @@ public class SettingsActivity extends PreferenceActivity {
 						preference.getContext()).getString(preference.getKey(),
 						""));
 	}
+	
+    public static class SettingsFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            // Load the preferences from an XML resource
+            addPreferencesFromResource(R.xml.settings);
+            
+            // Bind the summaries of EditText/List/Dialog preferences
+ 			// to their values. When their values change, their summaries are
+ 			// updated to reflect the new value, per the Android Design
+ 			// guidelines.
+            bindPreferenceSummaryToValue(findPreference("url"));
+            bindPreferenceSummaryToValue(findPreference("username"));
+            bindPreferenceSummaryToValue(findPreference("password"));
+        }
+    }
     
 }

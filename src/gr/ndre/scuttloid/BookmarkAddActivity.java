@@ -45,67 +45,65 @@ public class BookmarkAddActivity extends Activity
 		Bundle extras = this.getIntent().getExtras();
 		if (extras != null) {
 			// Set the text fields to the values of the passed in data.
-			EditText url_field = (EditText)findViewById(R.id.url);
+			EditText url_field = (EditText) findViewById(R.id.url);
 			url_field.setText(extras.getCharSequence(Intent.EXTRA_TEXT));
-			EditText title_field = (EditText)findViewById(R.id.title);
+			EditText title_field = (EditText) findViewById(R.id.title);
 			title_field.setText(extras.getString(Intent.EXTRA_SUBJECT));
 		}
 		
 		// Handle when the user presses the save button.
-		Button btnSave = (Button)findViewById(R.id.save_button);
+		Button btnSave = (Button) findViewById(R.id.save_button);
 		btnSave.setOnClickListener(this);
 	}
 	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
+	public boolean onOptionsItemSelected(MenuItem menu_item) {
+		if (menu_item.getItemId() == android.R.id.home) {
 				finish();
 				return true;
 		}
-		return super.onOptionsItemSelected(item);
+		return super.onOptionsItemSelected(menu_item);
 	}
 
 	@Override
-	public void onClick(View v) {
-		EditText field_url = (EditText)findViewById(R.id.url);
-		EditText field_title = (EditText)findViewById(R.id.title);
+	public void onClick(View view) {
+		EditText field_url = (EditText) findViewById(R.id.url);
+		EditText field_title = (EditText) findViewById(R.id.title);
 		String url = field_url.getText().toString();
 		String title = field_title.getText().toString();
-		String description = ((EditText)findViewById(R.id.description)).getText().toString(); 
-		String tags = ((EditText)findViewById(R.id.tags)).getText().toString();
-		String status = String.valueOf(((Spinner)findViewById(R.id.status)).getSelectedItemPosition());
+		String description = ((EditText) findViewById(R.id.description)).getText().toString(); 
+		String tags = ((EditText) findViewById(R.id.tags)).getText().toString();
+		String status = String.valueOf(((Spinner) findViewById(R.id.status)).getSelectedItemPosition());
 		
 		boolean error = false;
-		if (title.trim().equals("")) {
+		if ("".equals(title.trim())) {
 			field_title.setError(getString(R.string.error_titlerequired));
 			error = true;
 		}
-		if (url.trim().equals("")) {
+		if ("".equals(url.trim())) {
 			field_url.setError(getString(R.string.error_urlrequired));
 			error = true;
 		}
 		if (!error) {
-			item = new BookmarkContent.Item();
+			this.item = new BookmarkContent.Item();
 			String fixed_url = URLUtil.guessUrl(url);
 			if (fixed_url.endsWith("/")) {
 				fixed_url = fixed_url.substring(0, fixed_url.length() - 1);
 			}
-			item.url = fixed_url;
-			item.title = title;
-			item.description = description;
-			item.tags = tags;
-			item.status = status;
+			this.item.url = fixed_url;
+			this.item.title = title;
+			this.item.description = description;
+			this.item.tags = tags;
+			this.item.status = status;
 			
 			// Save the bookmark
 			ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
-			api.createBookmark(item);
+			api.createBookmark(this.item);
 		}
 	}
 	
 	protected SharedPreferences getGlobalPreferences() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
-		return preferences;
+		return PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
 	}
 
 	@Override
@@ -122,7 +120,7 @@ public class BookmarkAddActivity extends Activity
 
 	@Override
 	public void onBookmarkCreated() {
-		BookmarkContent.getShared().addItemToTop(item);
+		BookmarkContent.getShared().addItemToTop(this.item);
 		Toast.makeText(this, getString(R.string.bookmark_created), Toast.LENGTH_SHORT).show();
 		finish();
 	}
@@ -141,7 +139,7 @@ public class BookmarkAddActivity extends Activity
 	}
 
 	protected void sendToEdit() {
-		Integer position = BookmarkContent.getShared().getPosition(item.url);
+		Integer position = BookmarkContent.getShared().getPosition(this.item.url);
 		if (position != -1) {
 			Intent intent = new Intent(this, BookmarkEditActivity.class);
 			intent.putExtra(BookmarkDetailActivity.ARG_ITEM_POS, position);

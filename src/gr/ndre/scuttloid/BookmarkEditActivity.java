@@ -33,12 +33,12 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 		
 		// Fill the form with actual bookmark data
 		int position = getIntent().getIntExtra(BookmarkDetailActivity.ARG_ITEM_POS, 0);
-		item = (BookmarkContent.Item) BookmarkContent.getShared().getItem(position);
-		if (item != null) {
-			((TextView) findViewById(R.id.url)).setText(item.url);
-			((TextView) findViewById(R.id.title)).setText(item.title);
-			((TextView) findViewById(R.id.description)).setText(item.description);
-			((TextView) findViewById(R.id.tags)).setText(item.getTags());
+		this.item = (BookmarkContent.Item) BookmarkContent.getShared().getItem(position);
+		if (this.item != null) {
+			((TextView) findViewById(R.id.url)).setText(this.item.url);
+			((TextView) findViewById(R.id.title)).setText(this.item.title);
+			((TextView) findViewById(R.id.description)).setText(this.item.description);
+			((TextView) findViewById(R.id.tags)).setText(this.item.getTags());
 		}
 		
 		// Setup the Privacy (status) spinner.
@@ -50,46 +50,45 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 		spinner.setAdapter(adapter);
 		
 		// Handle when the user presses the save button.
-		Button btnSave = (Button)findViewById(R.id.save_button);
+		Button btnSave = (Button) findViewById(R.id.save_button);
 		btnSave.setOnClickListener(this);
 	}
 	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
+	public boolean onOptionsItemSelected(MenuItem menu_item) {
+		switch (menu_item.getItemId()) {
 			case android.R.id.home:
 				finish();
 				return true;
 		}
-		return super.onOptionsItemSelected(item);
+		return super.onOptionsItemSelected(menu_item);
 	}
 
 	@Override
-	public void onClick(View v) {
-		EditText field_title = (EditText)findViewById(R.id.title); 
+	public void onClick(View view) {
+		EditText field_title = (EditText) findViewById(R.id.title); 
 		String title = field_title.getText().toString();
-		String description = ((EditText)findViewById(R.id.description)).getText().toString(); 
-		String tags = ((EditText)findViewById(R.id.tags)).getText().toString();
-		String status = String.valueOf(((Spinner)findViewById(R.id.status)).getSelectedItemPosition());
+		String description = ((EditText) findViewById(R.id.description)).getText().toString(); 
+		String tags = ((EditText) findViewById(R.id.tags)).getText().toString();
+		String status = String.valueOf(((Spinner) findViewById(R.id.status)).getSelectedItemPosition());
 		
-		if (title.trim().equals("")) {
+		if ("".equals(title.trim())) {
 			field_title.setError(getString(R.string.error_titlerequired));
 		}
 		else {
-			item.title = title;
-			item.description = description;
-			item.tags = tags;
-			item.status = status;
+			this.item.title = title;
+			this.item.description = description;
+			this.item.tags = tags;
+			this.item.status = status;
 			
 			// Update the bookmark
 			ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
-			api.updateBookmark(item);
+			api.updateBookmark(this.item);
 		}
 	}
 	
 	protected SharedPreferences getGlobalPreferences() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
-		return preferences;
+		return PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
 	}
 
 	@Override
@@ -106,7 +105,7 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 
 	@Override
 	public void onBookmarkUpdated() {
-		BookmarkContent.getShared().addItemToTop(item);
+		BookmarkContent.getShared().addItemToTop(this.item);
 		Toast.makeText(this, getString(R.string.bookmark_updated), Toast.LENGTH_SHORT).show();
 		finish();
 	}

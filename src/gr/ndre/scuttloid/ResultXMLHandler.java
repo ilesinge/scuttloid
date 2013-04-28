@@ -11,7 +11,7 @@ public class ResultXMLHandler extends DefaultHandler {
 	
 	@Override
 	public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
-		if (localName.equalsIgnoreCase("result")) {
+		if ("result".equalsIgnoreCase(localName)) {
 			this.code = attributes.getValue("code");
 		}
 	}

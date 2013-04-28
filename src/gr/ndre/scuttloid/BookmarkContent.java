@@ -16,6 +16,16 @@ public class BookmarkContent {
 	protected static BookmarkContent shared_content;
 	
 	/**
+	 * A map of bookmark items, by URL.
+	 */
+	protected Map<String, Item> item_map = new HashMap<String, Item>();
+	
+	/**
+	 * An array of bookmark items.
+	 */
+	protected ArrayList<Item> items = new ArrayList<Item>();
+	
+	/**
 	 * Get shared instance
 	 */
 	public static BookmarkContent getShared() {
@@ -33,7 +43,7 @@ public class BookmarkContent {
 	 * Get item by location
 	 */
 	public Item getItem(int location) {
-		return items.get(location);
+		return this.items.get(location);
 	}
 	
 	/**
@@ -49,41 +59,31 @@ public class BookmarkContent {
 	 * Get item list
 	 */
 	public ArrayList<Item> getItems() {
-		return new ArrayList<Item>(items);
+		return new ArrayList<Item>(this.items);
 	}
-	
-	/**
-	 * A map of bookmark items, by URL.
-	 */
-	protected Map<String, Item> item_map = new HashMap<String, Item>();
-	
-	/**
-	 * An array of bookmark items.
-	 */
-	protected ArrayList<Item> items = new ArrayList<Item>();
 
 	/**
 	 * Add a bookmark to the collection.
 	 */
 	public void addItem(Item item) {
-		items.remove(item);
-		items.add(item);
-		item_map.put(item.url, item);
+		this.items.remove(item);
+		this.items.add(item);
+		this.item_map.put(item.url, item);
 	}
 	
 	/**
 	 * Add a bookmark to the top of the collection
 	 */
 	public void addItemToTop(Item item) {
-		items.remove(item);
-		items.add(0, item);
-		item_map.put(item.url, item);
+		this.items.remove(item);
+		this.items.add(0, item);
+		this.item_map.put(item.url, item);
 	}
 	
 	public int getPosition(String url) {
-		Item item = item_map.get(url);
+		Item item = this.item_map.get(url);
 		if (item != null) {
-			return items.indexOf(item);
+			return this.items.indexOf(item);
 		}
 		return -1;
 	}
@@ -97,37 +97,35 @@ public class BookmarkContent {
 		
 		public String url;
 		public String title;
-		protected String tags;
 		public String description;
 		public String status;
 		
-		// TODO maybe add URL as mandatory param in constructor
-		public Item() {}
-
+		protected String tags;
+		
 		@Override
 		public String toString() {
-			return title;
+			return this.title;
 		}
 		
 		public String getTags() {
-			String tags = "";
+			String real_tags = "";
 			if (!this.tags.equals("system:unfiled")) {
-				tags = this.tags;
+				real_tags = this.tags;
 			}
-			return tags;
+			return real_tags;
 		}
 		
 		public String getCSVTags() {
 			String output = "";
 			String[] atags = this.getTags().split(" ");
 			if (atags.length > 0) {
-				StringBuilder sb = new StringBuilder();
-				sb.append(atags[0]);
+				StringBuilder string_builder = new StringBuilder();
+				string_builder.append(atags[0]);
 				for (int i = 1; i < atags.length; i++) {
-					sb.append(", ");
-					sb.append(atags[i]);
+					string_builder.append(", ");
+					string_builder.append(atags[i]);
 				}
-				output = sb.toString();
+				output = string_builder.toString();
 			}
 			return output;
 		}

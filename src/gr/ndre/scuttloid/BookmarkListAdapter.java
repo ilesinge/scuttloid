@@ -17,28 +17,29 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	impl
 
 	protected ArrayList<BookmarkContent.Item> bookmarks;
 	protected ArrayList<BookmarkContent.Item> orig_bookmarks = new ArrayList<BookmarkContent.Item>();
-	private final Object lock = new Object();
 	protected Filter filter;
+	
+	private final Object lock = new Object();
 
-	public BookmarkListAdapter(Context context, int textViewResourceId, ArrayList<BookmarkContent.Item> bookmarks) {
-		super(context, textViewResourceId, bookmarks);
-		this.bookmarks = bookmarks;
-		this.orig_bookmarks = new ArrayList<BookmarkContent.Item>(bookmarks);
+	public BookmarkListAdapter(Context context, int textViewResourceId, ArrayList<BookmarkContent.Item> bookmark_list) {
+		super(context, textViewResourceId, bookmark_list);
+		this.bookmarks = bookmark_list;
+		this.orig_bookmarks = new ArrayList<BookmarkContent.Item>(bookmark_list);
 	}
 
 	@Override
 	public int getCount() {
-		return bookmarks.size();
+		return this.bookmarks.size();
 	}
 
 	@Override
 	public BookmarkContent.Item getItem(int position) {
-		return bookmarks.get(position);
+		return this.bookmarks.get(position);
 	}
 
 	@Override
 	public int getPosition(BookmarkContent.Item item) {
-		return bookmarks.indexOf(item);
+		return this.bookmarks.indexOf(item);
 	}
 
 	@Override
@@ -48,10 +49,10 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	impl
 
 	@Override
 	public Filter getFilter() {
-		if (filter == null) {
-			filter = new BookmarkFilter();
+		if (this.filter == null) {
+			this.filter = new BookmarkFilter();
 		}
-		return filter;
+		return this.filter;
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -69,12 +70,12 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	impl
 			((TextView) view.findViewById(R.id.title)).setText(item.title);
 			String tags = item.getCSVTags();
 			TextView tags_view = (TextView) view.findViewById(R.id.tags);
-			if (!tags.isEmpty()) {
-				tags_view.setText(item.getCSVTags());
-				tags_view.setVisibility(View.VISIBLE);
+			if (tags.isEmpty()) {
+				tags_view.setVisibility(View.GONE);
 			}
 			else {
-				tags_view.setVisibility(View.GONE);
+				tags_view.setText(item.getCSVTags());
+				tags_view.setVisibility(View.VISIBLE);
 			}
 		}
 
@@ -91,9 +92,9 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	impl
 			FilterResults results = new FilterResults();
 
 			// If the adapter array is empty, check the actual items array and use it
-			if (orig_bookmarks == null) {
-				synchronized (lock) {
-					orig_bookmarks = new ArrayList<BookmarkContent.Item>(bookmarks);
+			if (BookmarkListAdapter.this.orig_bookmarks == null) {
+				synchronized (BookmarkListAdapter.this.lock) {
+					BookmarkListAdapter.this.orig_bookmarks = new ArrayList<BookmarkContent.Item>(BookmarkListAdapter.this.bookmarks);
 				}
 			}
 
@@ -101,8 +102,8 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	impl
 				// No prefix is sent to filter by so we're going to send back
 				// the original array
 				ArrayList<BookmarkContent.Item> list;
-				synchronized (lock) {
-					list = new ArrayList<BookmarkContent.Item>(orig_bookmarks);
+				synchronized (BookmarkListAdapter.this.lock) {
+					list = new ArrayList<BookmarkContent.Item>(BookmarkListAdapter.this.orig_bookmarks);
 				}
 				results.values = list;
 				results.count = list.size();
@@ -112,8 +113,8 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	impl
 				String prefixString = prefix.toString().toLowerCase(Locale.getDefault());
 
 				ArrayList<BookmarkContent.Item> values;
-				synchronized (lock) {
-					values = new ArrayList<BookmarkContent.Item>(orig_bookmarks);
+				synchronized (BookmarkListAdapter.this.lock) {
+					values = new ArrayList<BookmarkContent.Item>(BookmarkListAdapter.this.orig_bookmarks);
 				}
 
 				final int count = values.size();
@@ -165,7 +166,7 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	impl
 		@Override
 		@SuppressWarnings("unchecked")
 		protected void publishResults(CharSequence prefix, FilterResults results) {
-			bookmarks = (ArrayList<BookmarkContent.Item>) results.values;
+			BookmarkListAdapter.this.bookmarks = (ArrayList<BookmarkContent.Item>) results.values;
 
 			if (results.count > 0) {
 				notifyDataSetChanged();
