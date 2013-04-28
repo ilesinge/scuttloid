@@ -200,6 +200,9 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.refresh:
+				this.loadBookmarks();
+				return true;
 			case R.id.settings:
 				Intent settings_intent = new Intent(this, SettingsActivity.class);
 				startActivity(settings_intent);
@@ -224,6 +227,10 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	}
 	
 	protected void loadBookmarks() {
+		// Ensure list is invisible
+		View list = findViewById(android.R.id.list);
+		list.setVisibility(View.GONE);
+		
 		// Ensure the progress bar is visible
 		View progress_bar = findViewById(R.id.progress_bar);
 		progress_bar.setVisibility(View.VISIBLE);
@@ -264,6 +271,9 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		// Remove the progress bar
 		View progress_bar = findViewById(R.id.progress_bar);
 		progress_bar.setVisibility(View.GONE);
+		// Display list
+		View list = findViewById(android.R.id.list);
+		list.setVisibility(View.VISIBLE);
 		
 		this.displayBookmarks();
 	}
@@ -278,9 +288,12 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	
 	@Override
 	public void onAPIError(String message) {
-	    AlertDialog alert = new AlertDialog.Builder(this).create();
-	    alert.setMessage(message);  
-	    alert.show();
+		AlertDialog alert = new AlertDialog.Builder(this).create();
+		alert.setMessage(message);  
+		alert.show();
+		// Display list
+		View list = findViewById(android.R.id.list);
+		list.setVisibility(View.VISIBLE);
 	}
 
 	@Override
