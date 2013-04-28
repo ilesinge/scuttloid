@@ -1,2 +1,7 @@
+# Eclipse-generated files
 /bin/
 /gen/
+
+# Local PMD & Checkstyle configuration
+.pmd
+.checkstyle
