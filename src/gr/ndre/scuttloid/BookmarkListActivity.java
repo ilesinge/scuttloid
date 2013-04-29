@@ -175,7 +175,6 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 	    SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
 	    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-	    searchView.setSubmitButtonEnabled(true);
 	    // Add live search capability
 	    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
