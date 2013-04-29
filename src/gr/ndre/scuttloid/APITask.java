@@ -3,6 +3,7 @@ package gr.ndre.scuttloid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,9 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.HTTP;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -34,6 +38,10 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 	public static final int UNKNOWN_HOST = 1001;
 	public static final int PARSE_ERROR = 1002;
 	public static final int SSL_ERROR = 1003;
+	public static final int TIMEOUT_ERROR = 1004;
+	
+	public static final int CONNECTION_TIMEOUT = 5000;
+	public static final int SOCKET_TIMEOUT = 15000;
 	
 	protected Callback callback;
 	protected String url;
@@ -99,6 +107,12 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		catch (SSLHandshakeException e) {
 			this.status = SSL_ERROR;
 		}
+		catch (ConnectTimeoutException e) {
+			this.status = TIMEOUT_ERROR;
+		}
+		catch (SocketTimeoutException e) {
+			this.status = TIMEOUT_ERROR;
+		}
 		catch (Exception e) {
 			this.status = GENERIC_ERROR;
 			//System.out.println(e.getClass().getName());
@@ -127,6 +141,12 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		else {
 			request = new HttpGet(this.url);
 		}
+		
+		// Set timeout limits
+		BasicHttpParams http_parameters = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(http_parameters, CONNECTION_TIMEOUT);
+		HttpConnectionParams.setSoTimeout(http_parameters, SOCKET_TIMEOUT);
+		request.setParams(http_parameters);
 		
 		// Add Basic Authentication header
 		this.addAuthHeader(request);

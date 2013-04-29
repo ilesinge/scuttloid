@@ -181,6 +181,9 @@ public class ScuttleAPI implements APITask.Callback {
 			case APITask.SSL_ERROR:
 				message = this.callback.getContext().getString(R.string.error_sslconnection);
 				break;
+			case APITask.TIMEOUT_ERROR:
+				message = this.callback.getContext().getString(R.string.error_timeout);
+				break;
 			case HttpStatus.SC_UNAUTHORIZED:
 				message = this.callback.getContext().getString(R.string.error_authentication);
 				break;
