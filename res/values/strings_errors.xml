@@ -2,9 +2,9 @@
 <resources>
     <!-- All error messages -->
     <string name="error_unknownhost">The server address could not be resolved. Please verify Semantic Scuttle server URL in the settings.</string>
-    <string name="error_xmlparse">The server response is invalid. Please verify Semantic Scuttle server URL in the settings.</string>
+    <string name="error_xmlparse">The server response is invalid. Please verify your Semantic Scuttle server URL in the settings.</string>
     <string name="error_authentication">Your username and password are not accepted. Please verify your authentication settings.</string>
-    <string name="error_notfound">It seems that the server address is incorrect. Please verify Semantic Scuttle server URL in the settings.</string>
+    <string name="error_notfound">It seems that the server address is incorrect. Please verify your Semantic Scuttle server URL in the settings.</string>
     <string name="error_sslconnection">An error occurred while trying to establish a SSL (https) connection with the server. </string>
     <string name="error_timeout">The connection to the server took too long to complete.</string>
     <string name="error_apigeneric">An error occurred while trying to communicate with the server.</string>
