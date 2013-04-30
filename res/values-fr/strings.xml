@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Scuttloid</string>
+    <string name="title_bookmark_detail">Détails du signet</string>
+    <string name="settings">Paramètres</string>
+    <string name="add">Ajouter</string>
+    <string name="edit">Editer</string>
+    <string name="title_bookmark_edit">Editer le signet</string>
+    <string name="title_bookmark_add">Ajouter un signet</string>
+    <string name="url_label">URL :</string>
+    <string name="title_label">Titre :</string>
+    <string name="description_label">Description :</string>
+    <string name="tags_label">Tags:</string>
+    <string name="status_label">Accès :</string>
+    <string name="status_prompt">Sélectionnez le niveau d\'accès</string>
+    <string-array name="status_options">
+        <item>Public</item>
+        <item>Partagé avec mes contacts</item>
+        <item>Privé</item>
+    </string-array>
+    <string name="save">Enregistrer</string>
+    <string name="bookmark_updated">Signet mis à jour !</string>
+    <string name="bookmark_created">Signet ajouté !</string>
+    <string name="bookmark_deleted">Signet supprimé !</string>
+    <string name="details">Afficher les détails</string>
+    <string name="open">Ouvrir</string>
+    <string name="share">Partager</string>
+    <string name="share_via">Partager avec</string>
+    <string name="delete">Supprimer</string>
+    <string name="delete_bookmark">Supprimer le signet</string>
+    <string name="delete_confirm">Etes-vous certain de vouloir supprimer le signet \"%1$s\" ?</string>
+    <string name="search">Rechercher</string>
+    <string name="refresh">Rafraîchir</string>
+</resources>

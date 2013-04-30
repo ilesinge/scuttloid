@@ -1,0 +1,15 @@
+<resources>
+
+    <string name="title_activity_settings">Paramètres de Scuttloid</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_url">URL du serveur Semantic Scuttle</string>
+    <string name="pref_url_summary">Adresse de votre serveur Semantic Scuttle</string>
+    <string name="pref_username">Nom d\'utilisateur</string>
+    <string name="pref_username_summary">Votre nom d\'utilisateur sur Semantic Scuttle</string>
+    <string name="pref_password">Mot de passe</string>
+    <string name="pref_password_summary">Votre mot de passe sur Semantic Scuttle</string>
+    <string name="pref_acceptallcerts">Accepter tous les certificats SSL</string>
+    <string name="pref_acceptallcerts_summary">ATTENTION: Cela représente un risque de sécurité important.</string>
+
+</resources>

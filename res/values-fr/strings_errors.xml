@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- All error messages -->
+    <string name="error_unknownhost">Le serveur n\'a pas pu être contacté. Veuillez vérifier l\'URL de votre serveur Semantic Scuttle dans les paramètres.</string>
+    <string name="error_xmlparse">La réponse du serveur est invalide. Veuillez vérifier l\'URL de votre serveur Semantic Scuttle dans les paramètres.</string>
+    <string name="error_authentication">Votre nom d\'utilisateur et votre mot de passe n\'ont pas été acceptés. Veuillez vérifier vos paramètres d\'authentification.</string>
+    <string name="error_notfound">Il semble que l\'adresse du serveur soit incorrecte. Veuillez vérifier l\'URL de votre serveur Semantic Scuttle dans les paramètres.</string>
+    <string name="error_sslconnection">Une erreur est survenue lors de l\'établissement d\'une connection SSL (https) avec le serveur.</string>
+    <string name="error_timeout">La connection au serveur a pris trop de temps pour s\'effectuer.</string>
+    <string name="error_apigeneric">Une erreur est survenue lors de la communication avec le serveur.</string>
+    <string name="error_titlerequired">Le titre est obligatoire</string>
+    <string name="error_urlrequired">L\'URL est obligatoire</string>
+    <string name="error_bookmarkexists">Ce signet existe déjà !</string>
+    <string name="error_bookmarkexists_retrieving">Ce signet existe déjà. Récupération du signet original pour que vous puissiez le modifier.</string>
+    <string name="error_bookmarkdelete_notfound">Ce signet n\'a pas été trouvé sur le serveur, il a peut-être déjà été supprimé.</string>
+</resources>
