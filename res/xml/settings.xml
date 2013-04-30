@@ -3,4 +3,5 @@
     <EditTextPreference android:title="@string/pref_url" android:summary="@string/pref_url_summary" android:key="url" android:inputType="textUri" />
     <EditTextPreference android:summary="@string/pref_username_summary" android:key="username" android:enabled="true" android:title="@string/pref_username"/>
     <EditTextPreference android:enabled="true" android:key="password" android:title="@string/pref_password" android:summary="@string/pref_password_summary" android:inputType="textPassword" />
+    <CheckBoxPreference android:key="acceptallcerts" android:title="@string/pref_acceptallcerts" android:summary="@string/pref_acceptallcerts_summary"/>
 </PreferenceScreen>

@@ -31,6 +31,7 @@ public class ScuttleAPI implements APITask.Callback {
 	protected String username;
 	protected String password;
 	protected Integer handler;
+	protected boolean accept_all_certs;
 	
 	protected Callback callback;
 	
@@ -41,6 +42,7 @@ public class ScuttleAPI implements APITask.Callback {
 		this.url = preferences.getString("url", "");
 		this.username = preferences.getString("username", "");
 		this.password = preferences.getString("password", "");
+		this.accept_all_certs = preferences.getBoolean("acceptallcerts", false);
 		this.callback = api_callback;
 	}
 	
@@ -147,6 +149,7 @@ public class ScuttleAPI implements APITask.Callback {
 		APITask task = new APITask(this, this.username, this.password);
 		String api_url = this.buildURL(path);
 		task.setURL(api_url);
+		task.acceptAllCerts(this.accept_all_certs);
 		return task;
 	}
 	

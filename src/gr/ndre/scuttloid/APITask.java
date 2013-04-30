@@ -9,22 +9,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Xml;
@@ -52,6 +60,7 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 	protected int method = METHOD_GET;
 	protected List<NameValuePair> data;
 	protected ArrayList<Integer> acceptable_statuses = new ArrayList<Integer>();
+	protected boolean accept_all_certs = false;
 	
 	APITask(Callback task_callback, String pref_username, String pref_password) {
 		this.callback = task_callback;
@@ -79,18 +88,42 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		this.acceptable_statuses.add(status_id);
 	}
 	
+	public void acceptAllCerts(boolean set_accept_all_certs) {
+		this.accept_all_certs = set_accept_all_certs;
+	}
+	
 	@Override
 	protected Void doInBackground(Void... params) {
-		AndroidHttpClient client = AndroidHttpClient.newInstance("gr.ndre.scuttloid");
+		DefaultHttpClient client = getClient();
 		HttpRequestBase request = buildRequest();
 		if (request != null) {
 			executeRequest(client, request);
 		}
-		client.close();
 		return null;
 	}
 
-	protected void executeRequest(AndroidHttpClient client, HttpRequestBase request) {
+	protected DefaultHttpClient getClient() {
+		DefaultHttpClient client;
+		if (this.url.startsWith("https://") & this.accept_all_certs) {
+			try {
+				SchemeRegistry schemeRegistry = new SchemeRegistry();
+				schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+				schemeRegistry.register(new Scheme("https", new TrustingSSLSocketFactory(), 443));
+				HttpParams params = new BasicHttpParams();
+				ClientConnectionManager connectionManager = 
+					    new ThreadSafeClientConnManager(params, schemeRegistry);
+				client = new DefaultHttpClient(connectionManager, params);
+			} catch (Exception e) {
+				client = new DefaultHttpClient();
+			}
+		}
+		else {
+			client = new DefaultHttpClient();
+		}
+		return client;
+	}
+
+	protected void executeRequest(HttpClient client, HttpRequestBase request) {
 		try {
 			HttpResponse response = client.execute(request);
 			this.status = response.getStatusLine().getStatusCode();
@@ -107,6 +140,9 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		catch (SSLHandshakeException e) {
 			this.status = SSL_ERROR;
 		}
+		catch (SSLPeerUnverifiedException e) {
+			this.status = SSL_ERROR;
+		}
 		catch (ConnectTimeoutException e) {
 			this.status = TIMEOUT_ERROR;
 		}
@@ -115,7 +151,7 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		}
 		catch (Exception e) {
 			this.status = GENERIC_ERROR;
-			//System.out.println(e.getClass().getName());
+			System.out.println(e.getClass().getName());
 		}
 	}
 	
