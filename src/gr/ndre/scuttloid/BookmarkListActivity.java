@@ -290,6 +290,9 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		AlertDialog alert = new AlertDialog.Builder(this).create();
 		alert.setMessage(message);  
 		alert.show();
+		// Remove the progress bar
+		View progress_bar = findViewById(R.id.progress_bar);
+		progress_bar.setVisibility(View.GONE);
 		// Display list
 		View list = findViewById(android.R.id.list);
 		list.setVisibility(View.VISIBLE);
