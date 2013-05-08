@@ -3,6 +3,8 @@ Scuttloid
 
 Semantic Scuttle android client inspired by [Semantic Scuttle Jar](https://github.com/jarofgreen/Semantic-Scuttle-Jar-For-Android).
 
+Latest stable version available on [F-Droid](http://f-droid.org/repository/browse/?fdid=gr.ndre.scuttloid).
+
 **Features:**
 
 - Lists your bookmarks from a Semantic Scuttle server
