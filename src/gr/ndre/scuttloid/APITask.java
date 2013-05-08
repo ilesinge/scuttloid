@@ -78,7 +78,7 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 	protected int method = METHOD_GET;
 	protected List<NameValuePair> data;
 	protected ArrayList<Integer> acceptable_statuses = new ArrayList<Integer>();
-	protected boolean accept_all_certs = false;
+	protected boolean accept_all_certs;
 	
 	APITask(Callback task_callback, String pref_username, String pref_password) {
 		this.callback = task_callback;
@@ -131,7 +131,8 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 				ClientConnectionManager connectionManager = 
 					    new ThreadSafeClientConnManager(params, schemeRegistry);
 				client = new DefaultHttpClient(connectionManager, params);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				client = new DefaultHttpClient();
 			}
 		}
@@ -169,7 +170,7 @@ public class APITask extends AsyncTask<Void, Void, Void> {
 		}
 		catch (Exception e) {
 			this.status = GENERIC_ERROR;
-			System.out.println(e.getClass().getName());
+			//System.out.println(e.getClass().getName());
 		}
 	}
 	

@@ -20,7 +20,6 @@ package gr.ndre.scuttloid;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -39,12 +38,12 @@ public class TrustingSSLSocketFactory extends SSLSocketFactory {
 
     private SSLContext sslContext = SSLContext.getInstance("TLS");
 
-    public TrustingSSLSocketFactory()
-    		throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+    public TrustingSSLSocketFactory() throws NoSuchAlgorithmException, KeyManagementException,
+    		KeyStoreException, UnrecoverableKeyException {
 
         super(null);
 
-        TrustManager tm = new X509TrustManager() {
+        TrustManager trust_manager = new X509TrustManager() {
 
             public void checkClientTrusted(X509Certificate[] chain, String authType)
             		throws CertificateException {
@@ -60,19 +59,19 @@ public class TrustingSSLSocketFactory extends SSLSocketFactory {
 
         };
 
-        sslContext.init(null, new TrustManager[] {tm}, null);
+        this.sslContext.init(null, new TrustManager[] {trust_manager}, null);
 
     }
 
     @Override
     public Socket createSocket(Socket socket, String host, int port, boolean autoClose)
-    		throws IOException, UnknownHostException {
-        return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
+    		throws IOException {
+        return this.sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
     }
 
     @Override
     public Socket createSocket() throws IOException {
-        return sslContext.getSocketFactory().createSocket();
+        return this.sslContext.getSocketFactory().createSocket();
     }
 
 }
