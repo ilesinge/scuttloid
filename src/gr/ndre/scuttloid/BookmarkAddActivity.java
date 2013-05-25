@@ -58,6 +58,8 @@ public class BookmarkAddActivity extends Activity
 				android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
+		int default_status = Integer.parseInt(this.getGlobalPreferences().getString("defaultstatus", "0"));
+		spinner.setSelection(default_status);
 		
 		// Get the extras data passed in with the intent.
 		Bundle extras = this.getIntent().getExtras();
