@@ -51,7 +51,7 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 		
 		// Fill the form with actual bookmark data
 		int position = getIntent().getIntExtra(BookmarkDetailActivity.ARG_ITEM_POS, 0);
-		this.item = (BookmarkContent.Item) BookmarkContent.getShared().getItem(position);
+		this.item = BookmarkContent.getShared().getItem(position);
 		if (this.item != null) {
 			((TextView) findViewById(R.id.url)).setText(this.item.url);
 			((TextView) findViewById(R.id.title)).setText(this.item.title);

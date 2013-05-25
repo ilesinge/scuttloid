@@ -38,10 +38,6 @@ import android.widget.Toast;
  * An activity representing a single Bookmark detail screen. This activity is
  * only used on handset devices. On tablet-size devices, item details are
  * presented side-by-side with a list of items in a {@link BookmarkListActivity}
- * .
- * <p>
- * This activity is mostly just a 'shell' activity containing nothing more than
- * a {@link BookmarkDetailFragment}.
  */
 public class BookmarkDetailActivity extends Activity implements ScuttleAPI.DeleteCallback {
 	
@@ -124,10 +120,10 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 	    		startActivity(intent);
 	    		return true;
 			case R.id.share:
-				intent = new Intent(android.content.Intent.ACTION_SEND);
+				intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("text/plain");
-				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, this.item.title);
-				intent.putExtra(android.content.Intent.EXTRA_TEXT, this.item.url);
+				intent.putExtra(Intent.EXTRA_SUBJECT, this.item.title);
+				intent.putExtra(Intent.EXTRA_TEXT, this.item.url);
 	    		startActivity(Intent.createChooser(intent, getString(R.string.share_via)));
     	    	return true;
 			case R.id.delete:

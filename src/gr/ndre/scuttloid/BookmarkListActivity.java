@@ -45,12 +45,6 @@ import android.widget.Toast;
  * An activity representing a list of Bookmarks. The activity
  * presents a list of items, which when touched, lead to a
  * {@link BookmarkDetailActivity} representing item details.
- * <p>
- * The list of items is a {@link BookmarkListFragment}.
- * <p>
- * This activity also implements the required
- * {@link BookmarkListFragment.Callback} interface to listen for item
- * selections.
  */
 public class BookmarkListActivity extends ListActivity implements ScuttleAPI.BookmarksCallback,
 	ScuttleAPI.DeleteCallback {
@@ -147,10 +141,10 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	    		return true;
 			case R.id.share:
 				item = this.bookmarks.getItem(position);
-				intent = new Intent(android.content.Intent.ACTION_SEND);
+				intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("text/plain");
-				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, item.title);
-				intent.putExtra(android.content.Intent.EXTRA_TEXT, item.url);
+				intent.putExtra(Intent.EXTRA_SUBJECT, item.title);
+				intent.putExtra(Intent.EXTRA_TEXT, item.url);
 	    		startActivity(Intent.createChooser(intent, getString(R.string.share_via)));
     	    	return true;
 			case R.id.delete:
