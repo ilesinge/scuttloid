@@ -11,5 +11,7 @@
     <string name="pref_password_summary">Your password on Semantic Scuttle</string>
     <string name="pref_acceptallcerts">Accept all SSL certificates</string>
     <string name="pref_acceptallcerts_summary">WARNING: This represents an important security risk.</string>
+    <string name="pref_defaultstatus">Default status</string>
+    <string name="pref_defaultstatus_summary">Default privacy status for bookmarks</string>
 
 </resources>

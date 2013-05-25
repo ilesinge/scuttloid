@@ -135,6 +135,7 @@ public class SettingsActivity extends PreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("url"));
             bindPreferenceSummaryToValue(findPreference("username"));
             bindPreferenceSummaryToValue(findPreference("password"));
+            bindPreferenceSummaryToValue(findPreference("defaultstatus"));
         }
     }
     

@@ -19,6 +19,11 @@
         <item>Shared with Watched List</item>
         <item>Private</item>
     </string-array>
+    <string-array name="status_keys">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
     <string name="save">Save</string>
     <string name="bookmark_updated">Bookmark updated!</string>
     <string name="bookmark_created">Bookmark added!</string>

@@ -11,5 +11,6 @@
     <string name="pref_password_summary">Votre mot de passe sur Semantic Scuttle</string>
     <string name="pref_acceptallcerts">Accepter tous les certificats SSL</string>
     <string name="pref_acceptallcerts_summary">ATTENTION: Cela représente un risque de sécurité important.</string>
-
+    <string name="pref_defaultstatus">Statut par défaut</string>
+    <string name="pref_defaultstatus_summary">Statut de confidentialité par défaut des signets</string>
 </resources>
