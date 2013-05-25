@@ -2,6 +2,10 @@
 /bin/
 /gen/
 
+# Android-studio generated files
+/out/
+/.idea/
+
 # Local PMD & Checkstyle configuration
 .pmd
 .checkstyle
