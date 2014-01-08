@@ -18,11 +18,11 @@
 
 package gr.ndre.scuttloid;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.text.InputType;
@@ -31,9 +31,9 @@ import android.text.InputType;
 /**
  * Settings screen
  */
-public class SettingsActivity extends PreferenceActivity {
-	
-	/**
+public class SettingsActivity extends Activity {
+
+    /**
 	 * A preference value change listener that updates the preference's summary
 	 * to reflect its new value.
 	 */
