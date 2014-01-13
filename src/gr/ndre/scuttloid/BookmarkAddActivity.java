@@ -140,9 +140,12 @@ public class BookmarkAddActivity extends Activity
 
 	@Override
 	public void onBookmarkCreated() {
-		BookmarkContent.getShared().addItemToTop(this.item);
-		Toast.makeText(this, getString(R.string.bookmark_created), Toast.LENGTH_SHORT).show();
-		finish();
+        BookmarkContent shared = BookmarkContent.getShared();
+        if (shared != null) {
+            shared.addItemToTop(this.item);
+        }
+        Toast.makeText(this, getString(R.string.bookmark_created), Toast.LENGTH_SHORT).show();
+        finish();
 	}
 
 	@Override
