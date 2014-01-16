@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="5sp"
-    android:paddingBottom="5sp" >
+    android:padding="12sp">
     
 	<TextView
 	    android:layout_width="fill_parent"
