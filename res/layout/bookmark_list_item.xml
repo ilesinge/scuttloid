@@ -4,19 +4,36 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingTop="5sp"
-    android:paddingBottom="5sp" >
-    
-	<TextView
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:id="@+id/title"
-	    android:textSize="16sp"
-	    android:textIsSelectable="false"/>
-	<TextView
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:id="@+id/tags"
-	    android:textSize="12sp"
-	    android:textIsSelectable="false"/>
-	
+    android:paddingBottom="5sp">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/title"
+        android:textSize="16sp"
+        android:textIsSelectable="false" />
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:id="@+id/tags"
+            android:textSize="12sp"
+            android:textIsSelectable="false" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:id="@+id/status"
+            android:textSize="12sp"
+            android:textIsSelectable="false" />
+    </LinearLayout>
+
 </LinearLayout>
