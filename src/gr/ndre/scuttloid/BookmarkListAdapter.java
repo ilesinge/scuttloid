@@ -18,9 +18,6 @@
 
 package gr.ndre.scuttloid;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -30,6 +27,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	implements Filterable {
 
@@ -89,13 +89,23 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	impl
 			String tags = item.getCSVTags();
 			TextView tags_view = (TextView) view.findViewById(R.id.tags);
 			if (tags.isEmpty()) {
-				tags_view.setVisibility(View.GONE);
-			}
+                tags_view.setText("");
+            }
 			else {
 				tags_view.setText(item.getCSVTags());
 				tags_view.setVisibility(View.VISIBLE);
 			}
-		}
+
+            // privacy status
+            TextView status_view = (TextView) view.findViewById(R.id.status);
+            if (item.status != null) {
+                String status_text = getContext().getResources().getStringArray(R.array.status_options)[Integer.parseInt(item.status)];
+                status_view.setText(status_text);
+                status_view.setVisibility(View.VISIBLE);
+            } else {
+                status_view.setVisibility(View.GONE);
+            }
+        }
 
 		return view;
 
