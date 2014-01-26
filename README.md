@@ -1,7 +1,7 @@
 Scuttloid
 =========
 
-Scuttloid is a Semantic Scuttle Android app. It is also compatible with [Memor](https://github.com/ilesinge/memor), as it partially implements the Semantic Scuttle API.
+Scuttloid is a [Semantic Scuttle](https://github.com/cweiske/SemanticScuttle) Android app. It is also compatible with [Memor](https://github.com/ilesinge/memor), as it partially implements the Semantic Scuttle API.
 
 Latest stable version available on [F-Droid](http://f-droid.org/repository/browse/?fdid=gr.ndre.scuttloid).
 
