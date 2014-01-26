@@ -1,9 +1,11 @@
 Scuttloid
 =========
 
-Semantic Scuttle android client inspired by [Semantic Scuttle Jar](https://github.com/jarofgreen/Semantic-Scuttle-Jar-For-Android).
+Scuttloid is a [Semantic Scuttle](https://github.com/cweiske/SemanticScuttle) Android app.
 
-Latest stable version available on [F-Droid](http://f-droid.org/repository/browse/?fdid=gr.ndre.scuttloid).
+It is also compatible with [Memor](https://github.com/ilesinge/memor), as it partially implements the Semantic Scuttle API.
+
+The latest stable version is available on [F-Droid](http://f-droid.org/repository/browse/?fdid=gr.ndre.scuttloid).
 
 **Features:**
 
@@ -15,10 +17,9 @@ Latest stable version available on [F-Droid](http://f-droid.org/repository/brows
 - Delete a bookmark
 - Open or share a bookmark
 
-Scuttloid may work with Scuttle.
-
 **Known Issues:**
 
 - The privacy status is not retained when editing an existing bookmark. This is due to a limitation in Semantic Scuttle API.
+- The pricacy status is not meaningfull in the case of a Memor server (as Memor does not include such a concept).
 
 Please use GitHub issue tracker if you encounter any issue.
