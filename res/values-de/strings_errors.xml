@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- All error messages -->
+    <string name="error_unknownhost">Die Server-Adresse konnte nicht aufgelöst werden. Bitte überprüfen Sie die Semantic Scuttle Server-URL in den Einstellungen.</string>
+    <string name="error_xmlparse">Die Antwort des Servers ist ungültig. Bitte überprüfen Sie die Semantic Scuttle Server-URL in den Einstellungen.</string>
+    <string name="error_authentication">Ihr Benutzername und Passwort wurden nicht akzeptiert. Bitte überprüfen Sie die Authentifizierungseinstellungen.</string>
+    <string name="error_notfound">Die Server-Adresse scheint falsch zu sein. Bitte überprüfen Sie die Semantic Scuttle Server-URL in den Einstellungen</string>
+    <string name="error_sslconnection">Beim Versuch, eine SSL (https) Verbindung mit dem Server herzustellen ist ein Fehler aufgetreten.</string>
+    <string name="error_timeout">Die Verbindung zum Server benötigte zu lange um abschließen.</string>
+    <string name="error_apigeneric">Bei dem Versuch, mit dem Server kommunizieren, ist ein Fehler aufgetreten.</string>
+    <string name="error_titlerequired">Der Title wird benötigt</string>
+    <string name="error_urlrequired">Die URL wird benötigt</string>
+    <string name="error_bookmarkexists">Dieses Lesezeichen ist bereits vorhanden!</string>
+    <string name="error_bookmarkexists_retrieving">Dieses Lesezeichen ist bereits vorhanden. Lade ursprüngliches Lesezeichen, damit sie es bearbeiten können.</string>
+    <string name="error_bookmarkdelete_notfound">Dieses Lesezeichen wurde auf dem Server nicht gefunden. Es wurde wahrscheinlich schon gelöscht.</string>
+</resources>
