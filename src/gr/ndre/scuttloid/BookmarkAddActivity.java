@@ -140,9 +140,10 @@ public class BookmarkAddActivity extends Activity
 
 	@Override
 	public void onBookmarkCreated() {
-        BookmarkContent shared = BookmarkContent.getShared();
-        if (shared != null) {
-            shared.addItemToTop(this.item);
+        BookmarkContent bookmarks = BookmarkContent.getShared();
+        if (bookmarks != null) {
+            // Otherwise we come from a SHARE intent and there is no need to put the item on top of the list.
+            bookmarks.addItemToTop(this.item);
         }
         Toast.makeText(this, getString(R.string.bookmark_created), Toast.LENGTH_SHORT).show();
         finish();
