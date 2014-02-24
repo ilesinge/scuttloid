@@ -25,6 +25,8 @@
         <item>2</item>
     </string-array>
     <string name="save">Save</string>
+    <string name="adding_bookmark">Adding Bookmark</string>
+    <string name="updating_bookmark">Updating Bookmark</string>
     <string name="bookmark_updated">Bookmark updated!</string>
     <string name="bookmark_created">Bookmark added!</string>
     <string name="bookmark_deleted">Bookmark deleted!</string>

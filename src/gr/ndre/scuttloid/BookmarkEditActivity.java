@@ -20,6 +20,7 @@ package gr.ndre.scuttloid;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -40,7 +41,12 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 	 * The bookmark content this activity is editing.
 	 */
 	private BookmarkContent.Item item;
-	
+
+    /**
+     * Stores an instance of the progress dialog
+     */
+    private ProgressDialog progressDialog;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -99,6 +105,9 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 			field_title.setError(getString(R.string.error_titlerequired));
 		}
 		else {
+            // Show progress dialog
+            this.progressDialog = ProgressDialog.show(this, "", getString(R.string.updating_bookmark), true);
+
 			this.item.title = title;
 			this.item.description = description;
 			this.item.tags = tags;
@@ -129,6 +138,10 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 	@Override
 	public void onBookmarkUpdated() {
 		BookmarkContent.getShared().addItemToTop(this.item);
+
+        //close progress dialog
+        this.progressDialog.dismiss();
+
 		Toast.makeText(this, getString(R.string.bookmark_updated), Toast.LENGTH_SHORT).show();
 		finish();
 	}
