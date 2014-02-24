@@ -34,7 +34,7 @@
     <string name="share_via">Teilen mit</string>
     <string name="delete">Löschen</string>
     <string name="delete_bookmark">Lösche Lesezeichen</string>
-    <string name="delete_confirm">Sind Sie sicher, dass sie das Lesezeichen \"%1$s\" löschen wollen?</string>
+    <string name="delete_confirm">Sind Sie sicher, dass Sie das Lesezeichen \"%1$s\" löschen wollen?</string>
     <string name="search">Suche</string>
     <string name="refresh">Aktualisieren</string>
 </resources>
