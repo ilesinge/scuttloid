@@ -7,7 +7,7 @@
     <string name="add">Hinzufügen</string>
     <string name="edit">Bearbeiten</string>
     <string name="title_bookmark_edit">Lesezeichen bearbeiten</string>
-    <string name="title_bookmark_add">Lesezeigen hinzufügen</string>
+    <string name="title_bookmark_add">Lesezeichen hinzufügen</string>
     <string name="url_label">URL:</string>
     <string name="title_label">Titel:</string>
     <string name="description_label">Beschreibung:</string>
@@ -25,6 +25,8 @@
         <item>2</item>
     </string-array>
     <string name="save">Speichern</string>
+    <string name="adding_bookmark">Lesezeichen wird hinzugefügt</string>
+    <string name="updating_bookmark">Lesezeichen wird bearbeitet</string>
     <string name="bookmark_updated">Lesezeichen bearbeitet!</string>
     <string name="bookmark_created">Lesezeichen hinzugefügt!</string>
     <string name="bookmark_deleted">Lesezeichen gelöscht!</string>
@@ -34,7 +36,7 @@
     <string name="share_via">Teilen mit</string>
     <string name="delete">Löschen</string>
     <string name="delete_bookmark">Lösche Lesezeichen</string>
-    <string name="delete_confirm">Sind Sie sicher, dass sie das Lesezeichen \"%1$s\" löschen wollen?</string>
+    <string name="delete_confirm">Sind Sie sicher, dass Sie das Lesezeichen \"%1$s\" löschen wollen?</string>
     <string name="search">Suche</string>
     <string name="refresh">Aktualisieren</string>
 </resources>
