@@ -20,6 +20,7 @@ package gr.ndre.scuttloid;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,6 +43,11 @@ public class BookmarkAddActivity extends Activity
 	 * The bookmark content this activity is editing.
 	 */
 	private BookmarkContent.Item item;
+
+    /**
+     * Stores an instance of the progress dialog
+     */
+    private ProgressDialog progressDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +111,9 @@ public class BookmarkAddActivity extends Activity
 			error = true;
 		}
 		if (!error) {
+            // Show progress dialog
+            this.progressDialog = ProgressDialog.show(this, "", getString(R.string.adding_bookmark), true);
+
 			this.item = new BookmarkContent.Item();
 			String fixed_url = URLUtil.guessUrl(url);
 			if (fixed_url.endsWith("/")) {
@@ -145,6 +154,9 @@ public class BookmarkAddActivity extends Activity
             // Otherwise we come from a SHARE intent and there is no need to put the item on top of the list.
             bookmarks.addItemToTop(this.item);
         }
+
+        //close progress dialog
+        this.progressDialog.dismiss();
         Toast.makeText(this, getString(R.string.bookmark_created), Toast.LENGTH_SHORT).show();
         finish();
 	}
