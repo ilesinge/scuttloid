@@ -39,7 +39,7 @@ import android.widget.Toast;
  * only used on handset devices. On tablet-size devices, item details are
  * presented side-by-side with a list of items in a {@link BookmarkListActivity}
  */
-public class BookmarkDetailActivity extends Activity implements ScuttleAPI.DeleteCallback {
+public class BookmarkDetailActivity extends Activity implements BookmarkManager.DeleteCallback {
 	
 	/**
 	 * The bundle extra representing the position of the item in the shared content list.
@@ -148,8 +148,8 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 	}
 
 	protected void onDeleteConfirmed() {
-		ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
-		api.deleteBookmark(this.item);
+        BookmarkManager manager = new BookmarkManager(this.getGlobalPreferences(), this);
+		manager.deleteBookmark(this.item);
 	}
 	
 	@Override
@@ -164,7 +164,7 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 	}
 
 	@Override
-	public void onAPIError(String message) {
+	public void onManagerError(String message) {
 	    AlertDialog alert = new AlertDialog.Builder(this).create();
 	    alert.setMessage(message);  
 	    alert.show();
