@@ -46,8 +46,8 @@ import android.widget.Toast;
  * presents a list of items, which when touched, lead to a
  * {@link BookmarkDetailActivity} representing item details.
  */
-public class BookmarkListActivity extends ListActivity implements ScuttleAPI.BookmarksCallback,
-	ScuttleAPI.DeleteCallback {
+public class BookmarkListActivity extends ListActivity implements BookmarkManager.BookmarksCallback,
+        BookmarkManager.DeleteCallback {
 
 	/**
 	 * Container for all bookmarks
@@ -171,8 +171,8 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	
 	protected void onDeleteConfirmed(Item item) {
 		this.bookmark_to_delete = item;
-		ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
-		api.deleteBookmark(item);
+        BookmarkManager manager = new BookmarkManager(this.getGlobalPreferences(), this);
+		manager.deleteBookmark(item);
 	}
 	
 	/**
@@ -247,8 +247,8 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 		progress_bar.setVisibility(View.VISIBLE);
 		
 		// Get the bookmarks
-		ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
-		api.getBookmarks();
+        BookmarkManager manager = new BookmarkManager(this.getGlobalPreferences(), this);
+		manager.getBookmarks();
 	}
 	
 	protected void displayBookmarks() {
@@ -298,7 +298,7 @@ public class BookmarkListActivity extends ListActivity implements ScuttleAPI.Boo
 	}
 	
 	@Override
-	public void onAPIError(String message) {
+	public void onManagerError(String message) {
 		AlertDialog alert = new AlertDialog.Builder(this).create();
 		alert.setMessage(message);  
 		alert.show();
