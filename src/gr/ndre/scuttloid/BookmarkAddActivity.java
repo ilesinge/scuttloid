@@ -36,7 +36,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 public class BookmarkAddActivity extends Activity
-	implements OnClickListener, ScuttleAPI.CreateCallback, ScuttleAPI.BookmarksCallback {
+	implements OnClickListener, BookmarkManager.CreateCallback, BookmarkManager.BookmarksCallback {
 
 	/**
 	 * The bookmark content this activity is editing.
@@ -117,8 +117,8 @@ public class BookmarkAddActivity extends Activity
 			this.item.status = status;
 			
 			// Save the bookmark
-			ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
-			api.createBookmark(this.item);
+            BookmarkManager manager = new BookmarkManager(this.getGlobalPreferences(), this);
+			manager.createBookmark(this.item);
 		}
 	}
 	
@@ -127,7 +127,7 @@ public class BookmarkAddActivity extends Activity
 	}
 
 	@Override
-	public void onAPIError(String message) {
+	public void onManagerError(String message) {
 	    AlertDialog alert = new AlertDialog.Builder(this).create();
 	    alert.setMessage(message);  
 	    alert.show();
@@ -180,9 +180,9 @@ public class BookmarkAddActivity extends Activity
 		progress_bar.setVisibility(View.VISIBLE);
 		
 		Toast.makeText(this, getString(R.string.error_bookmarkexists_retrieving), Toast.LENGTH_LONG).show();
-		
-		ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
-		api.getBookmarks();
+
+        BookmarkManager manager = new BookmarkManager(this.getGlobalPreferences(), this);
+		manager.getBookmarks();
 	}
 	
 	@Override

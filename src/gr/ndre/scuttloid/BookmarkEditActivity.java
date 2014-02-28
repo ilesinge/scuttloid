@@ -34,7 +34,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BookmarkEditActivity extends Activity implements OnClickListener, ScuttleAPI.UpdateCallback {
+public class BookmarkEditActivity extends Activity implements OnClickListener, BookmarkManager.UpdateCallback {
 
 	/**
 	 * The bookmark content this activity is editing.
@@ -102,7 +102,7 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 			this.item.status = status;
 			
 			// Update the bookmark
-			ScuttleAPI api = new ScuttleAPI(this.getGlobalPreferences(), this);
+            BookmarkManager api = new BookmarkManager(this.getGlobalPreferences(), this);
 			api.updateBookmark(this.item);
 		}
 	}
@@ -112,7 +112,7 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 	}
 
 	@Override
-	public void onAPIError(String message) {
+	public void onManagerError(String message) {
 	    AlertDialog alert = new AlertDialog.Builder(this).create();
 	    alert.setMessage(message);  
 	    alert.show();
