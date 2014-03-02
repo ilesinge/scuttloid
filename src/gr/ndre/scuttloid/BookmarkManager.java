@@ -18,19 +18,10 @@
 
 package gr.ndre.scuttloid;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.xml.sax.helpers.DefaultHandler;
-
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.webkit.URLUtil;
+
+import gr.ndre.scuttloid.database.DatabaseConnection;
 
 /**
  * Manages loading of bookmarks, locally and remote
@@ -38,17 +29,10 @@ import android.webkit.URLUtil;
 public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCallback, ScuttleAPI.BookmarksCallback, ScuttleAPI.DeleteCallback, ScuttleAPI.UpdateCallback {
 
     private ScuttleAPI scuttleAPI;
-
-    protected static final int BOOKMARKS = 0;
-    protected static final int UPDATE = 1;
-    protected static final int CREATE = 2;
-    protected static final int DELETE = 3;
+    private DatabaseConnection database;
 
     protected String url;
-    protected String username;
     protected String password;
-    protected Integer handler;
-    protected boolean accept_all_certs;
 
     protected Callback callback;
 
@@ -58,6 +42,7 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
     public BookmarkManager(SharedPreferences preferences, Callback manager_callback) {
         this.callback = manager_callback;
         this.scuttleAPI = new ScuttleAPI(preferences, this);
+        this.database = new DatabaseConnection( callback.getContext() );
     }
 
     /**
@@ -76,7 +61,18 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
      */
     @Override
     public void onBookmarksReceived(BookmarkContent bookmarks) {
+        // return to callback
         ( (BookmarksCallback)callback ).onBookmarksReceived(bookmarks);
+
+        // store bookmarks locally
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        database.setBookmarks(BookmarkContent.getShared());
+                    }
+                }
+        );
     }
 
     /**
