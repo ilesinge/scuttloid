@@ -31,6 +31,8 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
     private ScuttleAPI scuttleAPI;
     private DatabaseConnection database;
 
+    private long remote_update_time;
+
     protected String url;
     protected String password;
 
@@ -61,6 +63,8 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
      */
     @Override
     public void onLastUpdateReceived(long remote_update_time) {
+        // store, to pass to database later
+        this.remote_update_time = remote_update_time;
         // get last updated time from local database
         long local_update_time = database.getLastSync();
         // if remote data is newer
@@ -92,7 +96,7 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
                 new Runnable() {
                     @Override
                     public void run() {
-                        database.setBookmarks(bookmarks);
+                        database.setBookmarks(bookmarks, remote_update_time);
                     }
                 }
         ).start();
@@ -148,11 +152,13 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
     /**
      * Bookmark deleted
      * TODO: update local storage after deleting bookmark
-     * TODO: are deletions detected? Consider option to force redownloading ("clear cache")
+     * TODO: deletions on server are not detected yet
      */
     @Override
     public void onBookmarkDeleted() {
         ( (DeleteCallback)callback ).onBookmarkDeleted();
+        // clear cache, to refetch remote bookmarks on reload
+        database.clearCache();
     }
 
     /**
