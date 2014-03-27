@@ -19,6 +19,7 @@
 package gr.ndre.scuttloid;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,10 +41,12 @@ public class ScuttleAPI implements APITask.Callback {
 	protected static final int UPDATE = 1;
 	protected static final int CREATE = 2;
 	protected static final int DELETE = 3;
-	
+    protected static final int LAST_UPDATE = 4;
+
 	protected static final String ADD_PATH = "api/posts_add.php";
 	protected static final String GET_PATH = "api/posts_all.php";
 	protected static final String DELETE_PATH = "api/posts_delete.php";
+    protected static final String LAST_UPDATE_PATH = "api/posts_update.php?datemode=modified";
 
 	protected String url;
 	protected String username;
@@ -63,7 +66,17 @@ public class ScuttleAPI implements APITask.Callback {
 		this.accept_all_certs = preferences.getBoolean("acceptallcerts", false);
 		this.callback = api_callback;
 	}
-	
+
+    /**
+     * get date and time of last modification on server
+     */
+    public void getLastUpdate() {
+        this.handler = LAST_UPDATE;
+        APITask task = this.getAPITask(LAST_UPDATE_PATH);
+        task.setHandler(new LastUpdateXMLHandler());
+        task.execute();
+    }
+
 	public void getBookmarks() {
 		this.handler = BOOKMARKS;
 		APITask task = this.getAPITask(GET_PATH);
@@ -154,6 +167,10 @@ public class ScuttleAPI implements APITask.Callback {
 					this.sendResultError(xml_handler);
 				}
 				break;
+            case LAST_UPDATE:
+                long last_update = ((LastUpdateXMLHandler) xml_handler).last_update;
+                ((LastUpdateCallback) this.callback).onLastUpdateReceived(last_update);
+                break;
 		}
 	}
 
@@ -247,5 +264,9 @@ public class ScuttleAPI implements APITask.Callback {
 	public interface DeleteCallback extends Callback {
 		void onBookmarkDeleted();
 	}
+
+    public interface LastUpdateCallback extends Callback {
+        void onLastUpdateReceived( long last_update );
+    }
 
 }

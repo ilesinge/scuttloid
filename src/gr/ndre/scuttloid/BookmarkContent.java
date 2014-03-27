@@ -18,6 +18,8 @@
 
 package gr.ndre.scuttloid;
 
+import android.text.TextUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -147,5 +149,9 @@ public class BookmarkContent {
 			}
 			return output;
 		}
+
+        public void setTags(String[] tag_array) {
+            tags = TextUtils.join(" ", tag_array);
+        }
 	}
 }
