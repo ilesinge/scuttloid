@@ -60,24 +60,13 @@ public class DatabaseConnection {
     /**
      * set bookmarks, overwrite existing storage
      * @param bookmarks : the shared instance of BookmarkContent
+     * @param update_time : time in milliseconds to set as last update time (fixes unsynced server times)
      */
-    public void setBookmarks(BookmarkContent bookmarks) {
+    public void setBookmarks(BookmarkContent bookmarks, long update_time) {
         // store tags, that have been added already
 
-        try {
-            db.beginTransaction();
-
-            // empty all tables
-            db.delete(h.TABLE_BOOKMARKS, null, null);
-            db.delete(h.TABLE_TAGS, null, null);
-            db.delete(h.TABLE_TAG_NAMES, null, null);
-
-            db.setTransactionSuccessful();
-
-        } finally {
-            db.endTransaction();
-        }
-
+        // empty table
+        truncateTable();
 
         // store all tag names
         Set<String> tags = extractTags(bookmarks);
@@ -114,8 +103,7 @@ public class DatabaseConnection {
 
         // set last modification date/time
         SharedPreferences.Editor editor = preferences.edit();
-        Date date = new Date();
-        editor.putLong(PREFS_LAST_UPDATE, date.getTime()); //store current time in milliseconds
+        editor.putLong(PREFS_LAST_UPDATE, update_time); //store last update time in milliseconds
         editor.apply();
     }
 
@@ -205,7 +193,35 @@ public class DatabaseConnection {
         return bookmarks;
     }
 
+    /**
+     * delete all local data and force remote download next time
+     */
+    public void clearCache() {
+        // empty table
+        truncateTable();
+        // reset last update time
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putLong(PREFS_LAST_UPDATE, 0L);
+        editor.apply();
+    }
+
     public long getLastSync() {
         return preferences.getLong(PREFS_LAST_UPDATE, 0L);
+    }
+
+    protected void truncateTable() {
+        try {
+            db.beginTransaction();
+
+            // empty all tables
+            db.delete(h.TABLE_BOOKMARKS, null, null);
+            db.delete(h.TABLE_TAGS, null, null);
+            db.delete(h.TABLE_TAG_NAMES, null, null);
+
+            db.setTransactionSuccessful();
+
+        } finally {
+            db.endTransaction();
+        }
     }
 }
