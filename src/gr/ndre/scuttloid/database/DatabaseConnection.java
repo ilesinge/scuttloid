@@ -20,8 +20,12 @@ package gr.ndre.scuttloid.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,6 +38,10 @@ import gr.ndre.scuttloid.BookmarkContent;
  */
 public class DatabaseConnection {
 
+    private static final String PREFS_NAME = "database_prefs";
+    private static final String PREFS_LAST_UPDATE = "last_update";
+
+    private SharedPreferences preferences;
     private DatabaseHelper h;
     private SQLiteDatabase db;
 
@@ -42,6 +50,8 @@ public class DatabaseConnection {
      * @param context : a context for the database helper
      */
     public DatabaseConnection(Context context) {
+        // get preference instance
+        preferences = context.getApplicationContext().getSharedPreferences(PREFS_NAME, 0);
         // initialize database connection
         h = new DatabaseHelper(context);
         db = h.getWritableDatabase();
@@ -102,6 +112,11 @@ public class DatabaseConnection {
             db.endTransaction();
         }
 
+        // set last modification date/time
+        SharedPreferences.Editor editor = preferences.edit();
+        Date date = new Date();
+        editor.putLong(PREFS_LAST_UPDATE, date.getTime()); //store current time in milliseconds
+        editor.apply();
     }
 
     /**
@@ -152,7 +167,45 @@ public class DatabaseConnection {
     /**
      * get bookmarks, loads database into BookmarkContent
      */
-    public void getBookmarks(BookmarkContent bookmarks) {
-        //TODO: clear bookmark content and fill with data from database
+    public BookmarkContent getBookmarks() {
+        // query database
+        Cursor result = db.query(
+                h.TABLE_BOOKMARKS +
+                " LEFT JOIN " + h.TABLE_TAGS + " ON (" + h.TABLE_BOOKMARKS + "." + h.BOOKMARKS_KEY_ID + " = " + h.TABLE_TAGS + "." + h.TAGS_KEY_BOOKMARKID + ")" +
+                " LEFT JOIN " + h.TABLE_TAG_NAMES + " ON (" + h.TABLE_TAGS + "." + h.TAGS_KEY_TAGID + " = " + h.TABLE_TAG_NAMES + "." + h.TAGNAMES_KEY_ID + ")",
+                new String[]{h.BOOKMARKS_KEY_URL, h.BOOKMARKS_KEY_TITLE, h.BOOKMARKS_KEY_DESCRIPTION, h.BOOKMARKS_KEY_STATUS, "group_concat(" + h.TAGNAMES_KEY_TAGNAME + ")"},
+                null,
+                null,
+                h.BOOKMARKS_KEY_URL,
+                null,
+                h.TABLE_BOOKMARKS + "." + h.BOOKMARKS_KEY_ID
+        );
+
+        // fill BookmarkContent
+        BookmarkContent bookmarks = new BookmarkContent();
+        result.moveToFirst();
+        while( !result.isAfterLast() ) {
+            BookmarkContent.Item bookmark = new BookmarkContent.Item();
+            bookmark.url = result.getString(result.getColumnIndexOrThrow(h.BOOKMARKS_KEY_URL));
+            bookmark.title = result.getString(result.getColumnIndexOrThrow(h.BOOKMARKS_KEY_TITLE));
+            String tags = result.getString(result.getColumnIndexOrThrow("group_concat(" + h.TAGNAMES_KEY_TAGNAME + ")"));
+            //TODO: currently Tags are split here, to be joined in setTags, may change in the future?
+            if( tags != null ) {
+                bookmark.setTags( TextUtils.split(tags, ",") );
+            } else {
+                //TODO: is this the best way? If not set, results in NullPointerException
+                bookmark.setTags( new String[]{"system:unfiled"} );
+            }
+            bookmark.description = result.getString(result.getColumnIndexOrThrow(h.BOOKMARKS_KEY_DESCRIPTION));
+            bookmark.status = result.getString(result.getColumnIndexOrThrow(h.BOOKMARKS_KEY_STATUS));
+            bookmarks.addItem(bookmark);
+            result.moveToNext();
+        }
+
+        return bookmarks;
+    }
+
+    public long getLastSync() {
+        return preferences.getLong(PREFS_LAST_UPDATE, 0L);
     }
 }

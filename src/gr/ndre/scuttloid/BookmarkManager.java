@@ -26,7 +26,7 @@ import gr.ndre.scuttloid.database.DatabaseConnection;
 /**
  * Manages loading of bookmarks, locally and remote
  */
-public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCallback, ScuttleAPI.BookmarksCallback, ScuttleAPI.DeleteCallback, ScuttleAPI.UpdateCallback {
+public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCallback, ScuttleAPI.BookmarksCallback, ScuttleAPI.LastUpdateCallback, ScuttleAPI.DeleteCallback, ScuttleAPI.UpdateCallback {
 
     private ScuttleAPI scuttleAPI;
     private DatabaseConnection database;
@@ -48,19 +48,42 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
     /**
      * Get bookmarks
      * TODO: load local bookmarks if available and up to date
-     * TODO: maybe return local bookmarks immediately and remote bookmarks when received
+     * TODO: maybe return local bookmarks immediately and remote bookmarks when received (listeners)
      */
     public void getBookmarks() {
-        scuttleAPI.getBookmarks();
+        //get time of last update on server
+        scuttleAPI.getLastUpdate();
+        //TODO: in the meantime show local data. The top list element should contain a progress indicator (add method parameter to callback "bool complete")
+    }
+
+    /**
+     * Last update time received
+     */
+    @Override
+    public void onLastUpdateReceived(long remote_update_time) {
+        // get last updated time from local database
+        long local_update_time = database.getLastSync();
+        // if remote data is newer
+        if( local_update_time < remote_update_time ) {
+            //get bookmarks
+            scuttleAPI.getBookmarks();
+        } else {
+            //TODO: something like this will be inside getBookmarks someday.
+            // load bookmarks from database
+            BookmarkContent bookmarks = database.getBookmarks();
+            //callback
+            ( (BookmarksCallback)callback ).onBookmarksReceived(bookmarks);
+        }
+
     }
 
     /**
      * Received Bookmarks
-     * TODO: store bookmarks locally
+     * @param bookmarks: all received bookmarks. Final is needed to allow usage in a Thread
      * TODO: maybe, instead of callbacks, use listeners, that are called, when the bookmark content changes
      */
     @Override
-    public void onBookmarksReceived(BookmarkContent bookmarks) {
+    public void onBookmarksReceived(final BookmarkContent bookmarks) {
         // return to callback
         ( (BookmarksCallback)callback ).onBookmarksReceived(bookmarks);
 
@@ -69,10 +92,10 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
                 new Runnable() {
                     @Override
                     public void run() {
-                        database.setBookmarks(BookmarkContent.getShared());
+                        database.setBookmarks(bookmarks);
                     }
                 }
-        );
+        ).start();
     }
 
     /**
@@ -125,6 +148,7 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
     /**
      * Bookmark deleted
      * TODO: update local storage after deleting bookmark
+     * TODO: are deletions detected? Consider option to force redownloading ("clear cache")
      */
     @Override
     public void onBookmarkDeleted() {
