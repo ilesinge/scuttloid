@@ -137,6 +137,9 @@ public class BookmarkAddActivity extends Activity
 
 	@Override
 	public void onManagerError(String message) {
+        //close progress dialog
+        this.progressDialog.dismiss();
+        //display error message
 	    AlertDialog alert = new AlertDialog.Builder(this).create();
 	    alert.setMessage(message);  
 	    alert.show();
