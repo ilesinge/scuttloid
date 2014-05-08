@@ -167,6 +167,7 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
      */
     @Override
     public void onAPIError(String message) {
+        //TODO: show error, but also return bookmarks stored in database as a fallback
         this.callback.onManagerError(message);
     }
 
