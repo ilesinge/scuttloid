@@ -99,8 +99,17 @@ public class BookmarkListAdapter extends ArrayAdapter<BookmarkContent.Item>	impl
             // privacy status
             TextView status_view = (TextView) view.findViewById(R.id.status);
             if (item.status != null) {
-                String status_text = getContext().getResources().getStringArray(R.array.status_options)[Integer.parseInt(item.status)];
-                status_view.setText(status_text);
+                int status_int = Integer.parseInt(item.status);
+                // set icon
+                int status_icon_res = 0;
+                if( status_int == 1 ) { //shared
+                    status_icon_res = R.drawable.ic_status_shared;
+                } else if(  status_int == 2 ) { //private
+                    status_icon_res = R.drawable.ic_status_private;
+                }
+                status_view.setCompoundDrawablesWithIntrinsicBounds( status_icon_res, 0, 0, 0 );
+
+                // make visible
                 status_view.setVisibility(View.VISIBLE);
             } else {
                 status_view.setVisibility(View.GONE);

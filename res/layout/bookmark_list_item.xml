@@ -18,19 +18,19 @@
         android:orientation="horizontal">
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:id="@+id/status"
+            android:textSize="12sp"
+            android:textIsSelectable="false" />
+
+        <TextView
             android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ellipsize="end"
             android:id="@+id/tags"
-            android:textSize="12sp"
-            android:textIsSelectable="false" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:id="@+id/status"
             android:textSize="12sp"
             android:textIsSelectable="false" />
     </LinearLayout>
