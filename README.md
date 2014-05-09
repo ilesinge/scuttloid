@@ -16,6 +16,7 @@ The latest stable version is available on [F-Droid](http://f-droid.org/repositor
 - Edit your bookmarks
 - Delete a bookmark
 - Open or share a bookmark
+- Languages: English, French & German
 
 **Known Issues:**
 
