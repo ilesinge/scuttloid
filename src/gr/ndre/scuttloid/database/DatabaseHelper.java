@@ -48,7 +48,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String TAGNAMES_KEY_ID = "id";
     static final String TAGNAMES_KEY_TAGNAME = "tagname";
 
-    public DatabaseHelper(Context context) {
+    // Singleton instance
+    private static DatabaseHelper instance;
+
+    // returns the singleton instance
+    public static synchronized DatabaseHelper getInstance(Context context) {
+        if( instance == null ) {
+            instance = new DatabaseHelper(context);
+        }
+        return instance;
+    }
+
+    // private constructor, instance is accessible via getInstance
+    private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
