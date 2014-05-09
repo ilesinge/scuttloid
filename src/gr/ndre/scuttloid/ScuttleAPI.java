@@ -21,6 +21,8 @@ package gr.ndre.scuttloid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -40,10 +42,10 @@ public class ScuttleAPI implements APITask.Callback {
 	protected static final int UPDATE = 1;
 	protected static final int CREATE = 2;
 	protected static final int DELETE = 3;
-	
-	protected static final String ADD_PATH = "api/posts_add.php";
-	protected static final String GET_PATH = "api/posts_all.php";
-	protected static final String DELETE_PATH = "api/posts_delete.php";
+
+	protected static final String ADD_PATH = "/posts/add";
+	protected static final String GET_PATH = "/posts/all";
+	protected static final String DELETE_PATH = "/posts/delete";
 
 	protected String url;
 	protected String username;
@@ -58,6 +60,14 @@ public class ScuttleAPI implements APITask.Callback {
 	 */
 	public ScuttleAPI(SharedPreferences preferences, Callback api_callback) {
 		this.url = preferences.getString("url", "");
+
+        // append "/api" to url if necessary
+        Pattern url_pattern = Pattern.compile( ".*/(api|v1)/?" ); //v1 is for delicious api
+        Matcher url_matcher = url_pattern.matcher( this.url );
+        if( !url_matcher.matches() ) {
+            this.url += "/api";
+        }
+
 		this.username = preferences.getString("username", "");
 		this.password = preferences.getString("password", "");
 		this.accept_all_certs = preferences.getBoolean("acceptallcerts", false);
