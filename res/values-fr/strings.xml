@@ -20,6 +20,8 @@
         <item>Privé</item>
     </string-array>
     <string name="save">Enregistrer</string>
+    <string name="adding_bookmark">Ajout du signet</string>
+    <string name="updating_bookmark">Mise à jour du signet</string>
     <string name="bookmark_updated">Signet mis à jour !</string>
     <string name="bookmark_created">Signet ajouté !</string>
     <string name="bookmark_deleted">Signet supprimé !</string>
