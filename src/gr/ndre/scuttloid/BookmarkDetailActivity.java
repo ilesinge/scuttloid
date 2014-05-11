@@ -80,7 +80,27 @@ public class BookmarkDetailActivity extends Activity implements ScuttleAPI.Delet
 			this.setTextOrRemove(R.id.description, this.item.description);
 			this.setTextOrRemove(R.id.tags, this.item.getCSVTags());
 			((TextView) findViewById(R.id.url)).setText(this.item.url);
-		}
+
+            //privacy status
+            if (item.status != null) {
+                TextView status_view = (TextView) findViewById(R.id.status);
+                int status_int = Integer.parseInt(item.status);
+                //set text
+                status_view.setText(getContext().getResources().getStringArray(R.array.status_options)[status_int]);
+                //set icon
+                int status_icon_res = 0;
+                if( status_int == 0 ) { //shared
+                    status_icon_res = R.drawable.ic_status_public;
+                } if( status_int == 1 ) { //shared
+                    status_icon_res = R.drawable.ic_status_shared;
+                } else if(  status_int == 2 ) { //private
+                    status_icon_res = R.drawable.ic_status_private;
+                }
+                status_view.setCompoundDrawablesWithIntrinsicBounds( status_icon_res, 0, 0, 0 );
+            } else {
+                findViewById(R.id.status).setVisibility(View.GONE);
+            }
+        }
 	}
 	
 	protected void setTextOrRemove(int view_id, String value) {
