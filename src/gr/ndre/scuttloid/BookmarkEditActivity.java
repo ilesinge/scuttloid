@@ -72,10 +72,13 @@ public class BookmarkEditActivity extends Activity implements OnClickListener, S
 				android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
-		int default_status = Integer.parseInt(this.getGlobalPreferences().getString("defaultstatus", "0"));
-		spinner.setSelection(default_status);
-		
-		// Handle when the user presses the save button.
+        int status = Integer.parseInt(this.getGlobalPreferences().getString("defaultstatus", "0"));
+        if (this.item.status != null) {
+            status = Integer.parseInt(this.item.status);
+        }
+        spinner.setSelection(status);
+
+        // Handle when the user presses the save button.
 		Button btnSave = (Button) findViewById(R.id.save_button);
 		btnSave.setOnClickListener(this);
 	}
