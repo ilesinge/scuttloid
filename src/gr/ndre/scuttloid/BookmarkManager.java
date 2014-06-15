@@ -21,6 +21,8 @@ package gr.ndre.scuttloid;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Date;
+
 import gr.ndre.scuttloid.database.DatabaseConnection;
 
 /**
@@ -30,6 +32,8 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
 
     private ScuttleAPI scuttleAPI;
     private DatabaseConnection database;
+
+    private int serverAPIVersion;
 
     private long remote_update_time;
 
@@ -45,17 +49,41 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
         this.callback = manager_callback;
         this.scuttleAPI = new ScuttleAPI(preferences, this);
         this.database = new DatabaseConnection( callback.getContext() );
+
+        //get server version
+        String url = preferences.getString("url","");
+        if( url.indexOf( "delicious.com" ) != -1 ) {
+            this.serverAPIVersion = 0; // 0 means it's delicious.com
+        } else {
+            this.serverAPIVersion = 1; // 1 is the current semantic scuttle api
+        }
     }
 
     /**
      * Get bookmarks
-     * TODO: load local bookmarks if available and up to date
-     * TODO: maybe return local bookmarks immediately and remote bookmarks when received (listeners)
+     * Returns locally stored bookmarks
      */
     public void getBookmarks() {
+        // load bookmarks from database
+        BookmarkContent bookmarks = database.getBookmarks();
+        //callback
+        ( (BookmarksCallback)callback ).onBookmarksReceived(bookmarks);
+    }
+
+    /**
+     * refresh bookmarks
+     * Will load changes from the server, store them locally and return the updated list.
+     */
+    public void refreshBookmarks() {
         //get time of last update on server
-        scuttleAPI.getLastUpdate();
-        //TODO: in the meantime show local data. The top list element should contain a progress indicator (add method parameter to callback "bool complete")
+        if( this.serverAPIVersion == 0 ) { // on delicious.com
+            //TODO: use this for future versions of semantic scuttle. (In the current version, deletions are not detectable)
+            scuttleAPI.getLastUpdate();
+        } else {
+            // force refresh, by passing "now" as last update time of server
+            Date date = new Date();
+            onLastUpdateReceived( date.getTime() );
+        }
     }
 
     /**
@@ -72,11 +100,7 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
             //get bookmarks
             scuttleAPI.getBookmarks();
         } else {
-            //TODO: something like this will be inside getBookmarks someday.
-            // load bookmarks from database
-            BookmarkContent bookmarks = database.getBookmarks();
-            //callback
-            ( (BookmarksCallback)callback ).onBookmarksReceived(bookmarks);
+            ( (BookmarksCallback)callback ).onBookmarksReceived(null);
         }
 
     }
@@ -84,7 +108,6 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
     /**
      * Received Bookmarks
      * @param bookmarks: all received bookmarks. Final is needed to allow usage in a Thread
-     * TODO: maybe, instead of callbacks, use listeners, that are called, when the bookmark content changes
      */
     @Override
     public void onBookmarksReceived(final BookmarkContent bookmarks) {
