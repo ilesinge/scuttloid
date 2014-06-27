@@ -53,11 +53,7 @@ public class DatabaseConnection {
         // get preference instance
         preferences = context.getApplicationContext().getSharedPreferences(PREFS_NAME, 0);
         // initialize database connection
-<<<<<<< HEAD
-        h = new DatabaseHelper(context);
-=======
         h = DatabaseHelper.getInstance(context);
->>>>>>> local-storage
         db = h.getWritableDatabase();
     }
 

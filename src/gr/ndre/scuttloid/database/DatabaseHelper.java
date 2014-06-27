@@ -48,9 +48,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String TAGNAMES_KEY_ID = "id";
     static final String TAGNAMES_KEY_TAGNAME = "tagname";
 
-<<<<<<< HEAD
-    public DatabaseHelper(Context context) {
-=======
     // Singleton instance
     private static DatabaseHelper instance;
 
@@ -64,7 +61,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // private constructor, instance is accessible via getInstance
     private DatabaseHelper(Context context) {
->>>>>>> local-storage
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
