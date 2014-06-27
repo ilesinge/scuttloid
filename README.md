@@ -3,11 +3,14 @@ Scuttloid
 
 Scuttloid is a [Semantic Scuttle](https://github.com/cweiske/SemanticScuttle) Android app.
 
-It is also compatible with [Memor](https://github.com/ilesinge/memor), as it partially implements the Semantic Scuttle API.
+It is also compatible with [Delicious](https://delicious.com/) and [Memor](https://github.com/ilesinge/memor).
 
 The latest stable version is available on [F-Droid](http://f-droid.org/repository/browse/?fdid=gr.ndre.scuttloid).
 
-**Features:**
+What does the latest release include? Read [the change log](CHANGELOG.md)!
+
+Features:
+---------
 
 - Lists your bookmarks from a Semantic Scuttle server
 - Show detailed view of a bookmark
@@ -16,10 +19,15 @@ The latest stable version is available on [F-Droid](http://f-droid.org/repositor
 - Edit your bookmarks
 - Delete a bookmark
 - Open or share a bookmark
+- Languages: English, French & German
 
-**Known Issues:**
+**Delicious support:**
 
-- The privacy status is not retained when editing an existing bookmark. This is due to a limitation in Semantic Scuttle API.
-- The pricacy status is not meaningfull in the case of a Memor server (as Memor does not include such a concept).
+For Delicious, use the following string as Server URL setting : ``previous.delicious.com/v1/``.
 
-Please use GitHub issue tracker if you encounter any issue.
+Known Issues:
+-------------
+
+- The privacy status is only shown for existing bookmarks if you use the upcoming Semantic Scuttle release 0.99 or the github master branch.
+
+Please use GitHub issue tracker if you encounter any other issue.
