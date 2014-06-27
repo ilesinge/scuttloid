@@ -19,6 +19,7 @@
 package gr.ndre.scuttloid;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -33,55 +34,76 @@ import android.text.InputType;
  */
 public class SettingsActivity extends Activity {
 
+    private static SharedPreferences preferences;
+
     /**
-	 * A preference value change listener that updates the preference's summary
-	 * to reflect its new value.
+     * Updates the preference's summary to reflect its new value.
+     */
+    private static void updateSummaryToValue(Preference preference, Object value) {
+        String stringValue = value.toString();
+        if (stringValue.isEmpty()) {
+            // Put back the default summary
+            preference.setSummary((CharSequence) preference.getExtras().get("default_summary"));
+        }
+        else {
+            if (preference instanceof ListPreference) {
+                // For list preferences, look up the correct display value in
+                // the preference's 'entries' list.
+                ListPreference listPreference = (ListPreference) preference;
+                int index = listPreference.findIndexOfValue(stringValue);
+
+                CharSequence summary = null;
+                // Set the summary to reflect the new value.
+                if (index >= 0) {
+                    summary = listPreference.getEntries()[index];
+                }
+                preference.setSummary(summary);
+            }
+            else if (preference instanceof EditTextPreference) {
+                // For passwords, display dots as summary
+                int type = ((EditTextPreference) preference).getEditText().getInputType();
+                if (type == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                    int length = stringValue.length();
+                    StringBuilder string_builder = new StringBuilder(length);
+                    for (int i = 0; i < length; i++) {
+                        string_builder.append("●");
+                    }
+                    preference.setSummary(string_builder.toString());
+                }
+                // For other types, just set the value as summary
+                else {
+                    preference.setSummary(stringValue);
+                }
+            }
+            else {
+                // For all other preferences, set the summary to the value's
+                // simple string representation.
+                preference.setSummary(stringValue);
+            }
+        }
+    }
+
+    /**
+	 * A preference value change listener
 	 */
 	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object value) {
-			String stringValue = value.toString();
-			if (stringValue.isEmpty()) {
-				// Put back the default summary
-				preference.setSummary((CharSequence) preference.getExtras().get("default_summary"));
-			}
-			else {
-				if (preference instanceof ListPreference) {
-					// For list preferences, look up the correct display value in
-					// the preference's 'entries' list.
-					ListPreference listPreference = (ListPreference) preference;
-					int index = listPreference.findIndexOfValue(stringValue);
-	
-					CharSequence summary = null;
-					// Set the summary to reflect the new value.
-					if (index >= 0) {
-						summary = listPreference.getEntries()[index];
-					}
-					preference.setSummary(summary);
-				}
-				else if (preference instanceof EditTextPreference) {
-					// For passwords, display dots as summary
-					int type = ((EditTextPreference) preference).getEditText().getInputType();
-					if (type == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
-						int length = stringValue.length();
-						StringBuilder string_builder = new StringBuilder(length);
-					    for (int i = 0; i < length; i++) {
-					    	string_builder.append("●"); 
-					    }
-						preference.setSummary(string_builder.toString());
-					}
-					// For other types, just set the value as summary
-					else {
-						preference.setSummary(stringValue);
-					}
-				}
-				else {
-					// For all other preferences, set the summary to the value's
-					// simple string representation.
-					preference.setSummary(stringValue);
-				}
-			}
-			return true;
+            String prefKey = preference.getKey();
+
+            // update summary
+            if( !"acceptallcerts".equals(prefKey) ) {
+                updateSummaryToValue(preference, value);
+            }
+
+            // schedule refresh (set flag in shared pref)
+            if ("url".equals(prefKey) || "username".equals(prefKey) || "password".equals(prefKey) || "acceptallcerts".equals(prefKey)) {
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean(BookmarkListActivity.LIST_PREFS_NEEDS_REFRESH, true);
+                editor.apply();
+            }
+
+            return true;
 		}
 	};
 
@@ -93,6 +115,8 @@ public class SettingsActivity extends Activity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
+
+        preferences = getSharedPreferences(BookmarkListActivity.LIST_PREFS, 0);
     }
 	
 	/**
@@ -111,13 +135,13 @@ public class SettingsActivity extends Activity {
 		// Set the listener to watch for value changes.
 		preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
-		// Trigger the listener immediately with the preference's
+		// update the preferences summary with the preference's
 		// current value.
-		sBindPreferenceSummaryToValueListener.onPreferenceChange(
-				preference,
-				PreferenceManager.getDefaultSharedPreferences(
-						preference.getContext()).getString(preference.getKey(),
-						""));
+		updateSummaryToValue(
+                preference,
+                PreferenceManager.getDefaultSharedPreferences(
+                        preference.getContext()).getString(preference.getKey(),
+                        ""));
 	}
 	
     public static class SettingsFragment extends PreferenceFragment {
@@ -135,6 +159,7 @@ public class SettingsActivity extends Activity {
             bindPreferenceSummaryToValue(findPreference("url"));
             bindPreferenceSummaryToValue(findPreference("username"));
             bindPreferenceSummaryToValue(findPreference("password"));
+            findPreference("acceptallcerts").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
             bindPreferenceSummaryToValue(findPreference("defaultstatus"));
         }
     }

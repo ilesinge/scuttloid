@@ -36,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -62,10 +63,21 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 	protected BookmarkListAdapter adapter;
 	
 	protected String search_query = "";
-	
+
+    /**
+     * preferences key for list prefs
+     */
+	public static final String LIST_PREFS = "list_prefs";
+    public static final String LIST_PREFS_NEEDS_REFRESH = "needs_refresh";
+
+    public SharedPreferences getSharedPreferences () {
+        return this.getSharedPreferences("FILE", 0);
+    }
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_bookmark_list);
 		ListView list = getListView();
 		registerForContextMenu(list);
@@ -82,12 +94,26 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 	@Override
 	public void onResume() {
 		super.onResume();
-		
-		// TODO : verify that the bookmarks are not reloaded on orientation change
-		String pref_url = getURL();
-		if (!"".equals(pref_url) && !(this.bookmarks instanceof BookmarkContent)) {
-			this.loadBookmarks();
-		}
+
+        // skip loading bookmarks if server url is not set
+        String pref_url = getURL();
+        if (!"".equals(pref_url)) {
+            // if a refresh is scheduled, refresh the bookmarks instead of loading them from the database
+            SharedPreferences preferences = getSharedPreferences(BookmarkListActivity.LIST_PREFS, 0);
+            Boolean refresh = preferences.getBoolean(LIST_PREFS_NEEDS_REFRESH, true);
+            if (refresh) {
+                this.refreshBookmarks();
+                // reset scheduled refresh
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean(BookmarkListActivity.LIST_PREFS_NEEDS_REFRESH, false);
+                editor.apply();
+            } else {
+                // TODO : verify that the bookmarks are not reloaded on orientation change
+                if (!(this.bookmarks instanceof BookmarkContent)) {
+                    this.loadBookmarks();
+                }
+            }
+        }
 		// Reload bookmarks if we are not showing search results
 		if (this.bookmarks instanceof BookmarkContent) {
 			this.bookmarks = BookmarkContent.getShared();
@@ -212,7 +238,7 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.refresh:
-				this.loadBookmarks();
+				this.refreshBookmarks();
 				return true;
 			case R.id.settings:
 				Intent settings_intent = new Intent(this, SettingsActivity.class);
@@ -243,13 +269,21 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 		list.setVisibility(View.GONE);
 		
 		// Ensure the progress bar is visible
-		View progress_bar = findViewById(R.id.progress_bar);
-		progress_bar.setVisibility(View.VISIBLE);
-		
+        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+
 		// Get the bookmarks
         BookmarkManager manager = new BookmarkManager(this.getGlobalPreferences(), this);
 		manager.getBookmarks();
 	}
+
+    protected void refreshBookmarks() {
+        // Ensure the progress bar is visible
+        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+
+        // refresh the bookmarks
+        BookmarkManager manager = new BookmarkManager(this.getGlobalPreferences(), this);
+        manager.refreshBookmarks();
+    }
 	
 	protected void displayBookmarks() {
 		// Set the list adapter
@@ -273,15 +307,20 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 			});
 		}
 	}
-	
+
+    /**
+     * Display the received bookmarks and hide loaders
+     * @param new_bookmarks: a list of all bookmarks or null if unchanged
+     */
 	@Override
 	public void onBookmarksReceived(BookmarkContent new_bookmarks) {
-		this.bookmarks = new_bookmarks;
-		BookmarkContent.setShared(new_bookmarks);
-		
+        if( new_bookmarks != null ) {
+            this.bookmarks = new_bookmarks;
+            BookmarkContent.setShared(new_bookmarks);
+        }
+
 		// Remove the progress bar
-		View progress_bar = findViewById(R.id.progress_bar);
-		progress_bar.setVisibility(View.GONE);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 		// Display list
 		View list = findViewById(android.R.id.list);
 		list.setVisibility(View.VISIBLE);
@@ -303,8 +342,7 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 		alert.setMessage(message);  
 		alert.show();
 		// Remove the progress bar
-		View progress_bar = findViewById(R.id.progress_bar);
-		progress_bar.setVisibility(View.GONE);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 		// Display list
 		View list = findViewById(android.R.id.list);
 		list.setVisibility(View.VISIBLE);
