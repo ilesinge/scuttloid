@@ -63,7 +63,17 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 	protected BookmarkListAdapter adapter;
 	
 	protected String search_query = "";
-	
+
+    /**
+     * preferences key for list prefs
+     */
+	public static final String LIST_PREFS = "list_prefs";
+    public static final String LIST_PREFS_NEEDS_REFRESH = "needs_refresh";
+
+    public SharedPreferences getSharedPreferences () {
+        return this.getSharedPreferences("FILE", 0);
+    }
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -85,11 +95,25 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 	public void onResume() {
 		super.onResume();
 
-		// TODO : verify that the bookmarks are not reloaded on orientation change
-		String pref_url = getURL();
-		if (!"".equals(pref_url) && !(this.bookmarks instanceof BookmarkContent)) {
-			this.loadBookmarks();
-		}
+        // skip loading bookmarks if server url is not set
+        String pref_url = getURL();
+        if (!"".equals(pref_url)) {
+            // if a refresh is scheduled, refresh the bookmarks instead of loading them from the database
+            SharedPreferences preferences = getSharedPreferences(BookmarkListActivity.LIST_PREFS, 0);
+            Boolean refresh = preferences.getBoolean(LIST_PREFS_NEEDS_REFRESH, true);
+            if (refresh) {
+                this.refreshBookmarks();
+                // reset scheduled refresh
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean(BookmarkListActivity.LIST_PREFS_NEEDS_REFRESH, false);
+                editor.apply();
+            } else {
+                // TODO : verify that the bookmarks are not reloaded on orientation change
+                if (!(this.bookmarks instanceof BookmarkContent)) {
+                    this.loadBookmarks();
+                }
+            }
+        }
 		// Reload bookmarks if we are not showing search results
 		if (this.bookmarks instanceof BookmarkContent) {
 			this.bookmarks = BookmarkContent.getShared();
