@@ -29,6 +29,7 @@ import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -41,6 +42,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
+import android.support.v4.widget.SwipeRefreshLayout;
 
 /**
  * An activity representing a list of Bookmarks. The activity
@@ -48,7 +50,7 @@ import android.widget.Toast;
  * {@link BookmarkDetailActivity} representing item details.
  */
 public class BookmarkListActivity extends ListActivity implements BookmarkManager.BookmarksCallback,
-        BookmarkManager.DeleteCallback {
+        BookmarkManager.DeleteCallback, SwipeRefreshLayout.OnRefreshListener {
 
 	/**
 	 * Container for all bookmarks
@@ -63,6 +65,8 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 	protected BookmarkListAdapter adapter;
 	
 	protected String search_query = "";
+
+    private SwipeRefreshLayout swipeLayout;
 
     /**
      * preferences key for list prefs
@@ -89,6 +93,15 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 		}
 		
 		handleIntent();
+
+        //setup swipeLayout
+        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        swipeLayout.setOnRefreshListener(this);
+
+        swipeLayout.setColorSchemeResources(android.R.color.holo_orange_light,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_green_light);
 	}
 	
 	@Override
@@ -134,7 +147,12 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 			this.search_query = getIntent().getStringExtra(SearchManager.QUERY);
 		}
 	}
-	
+
+    // refresh bookmarks on swipe
+    @Override public void onRefresh() {
+        this.refreshBookmarks();
+    }
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, view, menuInfo);
@@ -267,9 +285,6 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 		// Ensure list is invisible
 		View list = findViewById(android.R.id.list);
 		list.setVisibility(View.GONE);
-		
-		// Ensure the progress bar is visible
-        setProgressBarIndeterminateVisibility(Boolean.TRUE);
 
 		// Get the bookmarks
         BookmarkManager manager = new BookmarkManager(this.getGlobalPreferences(), this);
@@ -277,8 +292,8 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 	}
 
     protected void refreshBookmarks() {
-        // Ensure the progress bar is visible
-        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+        // start 'refresh' animation
+        swipeLayout.setRefreshing(true);
 
         // refresh the bookmarks
         BookmarkManager manager = new BookmarkManager(this.getGlobalPreferences(), this);
@@ -319,8 +334,9 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
             BookmarkContent.setShared(new_bookmarks);
         }
 
-		// Remove the progress bar
-        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+        // stop 'refresh' animation
+        swipeLayout.setRefreshing(false);
+
 		// Display list
 		View list = findViewById(android.R.id.list);
 		list.setVisibility(View.VISIBLE);
@@ -341,8 +357,10 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 		AlertDialog alert = new AlertDialog.Builder(this).create();
 		alert.setMessage(message);  
 		alert.show();
-		// Remove the progress bar
-        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        // stop 'refresh' animation
+        swipeLayout.setRefreshing(false);
+
 		// Display list
 		View list = findViewById(android.R.id.list);
 		list.setVisibility(View.VISIBLE);
