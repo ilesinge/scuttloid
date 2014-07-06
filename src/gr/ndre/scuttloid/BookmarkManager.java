@@ -33,8 +33,6 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
     private ScuttleAPI scuttleAPI;
     private DatabaseConnection database;
 
-    private int serverAPIVersion;
-
     private long remote_update_time;
 
     protected String url;
@@ -49,14 +47,6 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
         this.callback = manager_callback;
         this.scuttleAPI = new ScuttleAPI(preferences, this);
         this.database = new DatabaseConnection( callback.getContext() );
-
-        //get server version
-        String url = preferences.getString("url","");
-        if( url.indexOf( "delicious.com" ) != -1 ) {
-            this.serverAPIVersion = 0; // 0 means it's delicious.com
-        } else {
-            this.serverAPIVersion = 1; // 1 is the current semantic scuttle api
-        }
     }
 
     /**
@@ -76,14 +66,7 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
      */
     public void refreshBookmarks() {
         //get time of last update on server
-        if( this.serverAPIVersion == 0 ) { // on delicious.com
-            //TODO: use this for future versions of semantic scuttle. (In the current version, deletions are not detectable)
-            scuttleAPI.getLastUpdate();
-        } else {
-            // force refresh, by passing "now" as last update time of server
-            Date date = new Date();
-            onLastUpdateReceived( date.getTime() );
-        }
+        scuttleAPI.getLastUpdate();
     }
 
     /**

@@ -43,6 +43,8 @@ public class ScuttleAPI implements APITask.Callback {
 	protected static final int DELETE = 3;
     protected static final int LAST_UPDATE = 4;
 
+    protected int serverAPIVersion;
+
 	protected static final String ADD_PATH = "api/posts_add.php";
 	protected static final String GET_PATH = "api/posts_all.php";
 	protected static final String DELETE_PATH = "api/posts_delete.php";
@@ -65,16 +67,30 @@ public class ScuttleAPI implements APITask.Callback {
 		this.password = preferences.getString("password", "");
 		this.accept_all_certs = preferences.getBoolean("acceptallcerts", false);
 		this.callback = api_callback;
+
+        // detect api version
+        if( this.url.indexOf( "delicious.com" ) != -1 ) {
+            this.serverAPIVersion = 0; // 0 means it's delicious.com
+        } else {
+            this.serverAPIVersion = 1; // 1 is the current semantic scuttle api
+        }
 	}
 
     /**
      * get date and time of last modification on server
      */
     public void getLastUpdate() {
-        this.handler = LAST_UPDATE;
-        APITask task = this.getAPITask(LAST_UPDATE_PATH);
-        task.setHandler(new LastUpdateXMLHandler());
-        task.execute();
+        if( this.serverAPIVersion == 1 ) {
+            // In the current version of the semantic scuttle API deletions are not detectable
+            // instead the bookmarks are always reloaded
+            Date date = new Date();
+            ((LastUpdateCallback) this.callback).onLastUpdateReceived( date.getTime() );
+        } else {
+            this.handler = LAST_UPDATE;
+            APITask task = this.getAPITask(LAST_UPDATE_PATH);
+            task.setHandler(new LastUpdateXMLHandler());
+            task.execute();
+        }
     }
 
 	public void getBookmarks() {
