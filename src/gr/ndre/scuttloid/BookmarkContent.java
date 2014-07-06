@@ -109,7 +109,7 @@ public class BookmarkContent {
 	/**
 	 * A bookmark item representing a piece of content.
 	 */
-	public static class Item implements Serializable {
+	public static class Item implements Serializable, Cloneable {
 		
 		private static final long serialVersionUID = 4226037964405984432L;
 		
@@ -147,5 +147,14 @@ public class BookmarkContent {
 			}
 			return output;
 		}
-	}
+
+        @Override
+        public Item clone() {
+            try {
+                return (Item)super.clone();
+            } catch( CloneNotSupportedException e ) {
+                return null;
+            }
+        }
+    }
 }

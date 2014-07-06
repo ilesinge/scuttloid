@@ -47,6 +47,8 @@ public class ScuttleAPI implements APITask.Callback {
 	protected static final String GET_PATH = "/posts/all";
 	protected static final String DELETE_PATH = "/posts/delete";
 
+    protected int serverAPIVersion;
+
 	protected String url;
 	protected String username;
 	protected String password;
@@ -72,6 +74,13 @@ public class ScuttleAPI implements APITask.Callback {
 		this.password = preferences.getString("password", "");
 		this.accept_all_certs = preferences.getBoolean("acceptallcerts", false);
 		this.callback = api_callback;
+
+        // detect api version
+        if( this.url.indexOf( "delicious.com" ) != -1 ) {
+            this.serverAPIVersion = 0; // 0 means it's delicious.com
+        } else {
+            this.serverAPIVersion = 1; // 1 is the current semantic scuttle api
+        }
 	}
 	
 	public void getBookmarks() {
@@ -80,13 +89,25 @@ public class ScuttleAPI implements APITask.Callback {
 		task.setHandler(new BookmarksXMLHandler());
 		task.execute();
 	}
+
+    // adjust content of item for specific api versions
+    protected void prepareItem(BookmarkContent.Item item) {
+        if( this.serverAPIVersion == 0 ) {
+            // delicious.com expects comma separated tags
+            item.tags = item.tags.replace( " ", "," );
+        }
+    }
 	
 	public void updateBookmark(BookmarkContent.Item item) {
+        // prepare item
+        BookmarkContent.Item local_item = item.clone();
+        this.prepareItem(local_item);
+        // setup task
 		this.handler = UPDATE;
 		APITask task = this.getAPITask(ADD_PATH);
 		task.setMethod(APITask.METHOD_POST);
 		// Prepare post data
-		List<NameValuePair> params = this.itemToParams(item);
+		List<NameValuePair> params = this.itemToParams(local_item);
 		// Force bookmark replacement
 		params.add(new BasicNameValuePair("replace", "yes"));
 		task.setData(params);
@@ -99,12 +120,16 @@ public class ScuttleAPI implements APITask.Callback {
 	}
 	
 	public void createBookmark(BookmarkContent.Item item) {
+        // prepare item
+        BookmarkContent.Item local_item = item.clone();
+        this.prepareItem(local_item);
+        // setup task
 		this.handler = CREATE;
 		APITask task = this.getAPITask(ADD_PATH);
 		task.setMethod(APITask.METHOD_POST);
 		
 		// Prepare post data
-		List<NameValuePair> params = this.itemToParams(item);
+		List<NameValuePair> params = this.itemToParams(local_item);
 		task.setData(params);
 		task.setHandler(new ResultXMLHandler());
 		// accept 400 : missing field
