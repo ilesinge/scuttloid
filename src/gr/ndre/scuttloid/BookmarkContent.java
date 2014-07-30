@@ -119,6 +119,7 @@ public class BookmarkContent {
 		public String title;
 		public String description;
 		public String status;
+        public String time;
 		
 		protected String tags;
 		

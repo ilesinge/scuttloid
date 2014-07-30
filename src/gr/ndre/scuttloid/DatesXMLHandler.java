@@ -22,25 +22,23 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.util.HashMap;
 
-public class BookmarksXMLHandler extends DefaultHandler {
+
+public class DatesXMLHandler extends DefaultHandler {
 	
-	public BookmarkContent bookmarks = new BookmarkContent();
+	public HashMap<String, Integer> dates = new HashMap<String, Integer>();
 	
-	public BookmarkContent getBookmarks() {
-		return this.bookmarks;
+	public HashMap<String, Integer> getDates() {
+		return this.dates;
 	}
 	
 	@Override
 	public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
-		if ("post".equalsIgnoreCase(localName)) {
-			BookmarkContent.Item bookmark = new BookmarkContent.Item();
-			bookmark.url = attributes.getValue("href");
-			bookmark.title = attributes.getValue("description");
-			bookmark.tags = attributes.getValue("tag");
-			bookmark.description = attributes.getValue("extended");
-            bookmark.time = attributes.getValue("time");
-			this.bookmarks.addItem(bookmark);
+		if ("date".equalsIgnoreCase(localName)) {
+			String date = attributes.getValue("date");
+			int count = Integer.parseInt(attributes.getValue("count"));
+			this.dates.put(date, count);
 		}
 	}
 }

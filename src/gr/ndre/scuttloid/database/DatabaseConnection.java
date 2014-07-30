@@ -83,6 +83,7 @@ public class DatabaseConnection {
                 values.put(h.BOOKMARKS_KEY_TITLE, item.title);
                 values.put(h.BOOKMARKS_KEY_DESCRIPTION, item.description);
                 values.put(h.BOOKMARKS_KEY_STATUS, item.status);
+                values.put(h.BOOKMARKS_KEY_DATE, item.time);
 
                 long insertedBookmarkdId = db.insert(h.TABLE_BOOKMARKS, null, values);
 
@@ -191,6 +192,36 @@ public class DatabaseConnection {
         }
 
         return bookmarks;
+    }
+
+    /**
+     * count bookmarks for each day and return map: date->count
+     */
+    public HashMap<String, Integer> getDates() {
+        // query database
+        Cursor result = db.query(
+                h.TABLE_BOOKMARKS,
+                new String[]{"date(" + h.BOOKMARKS_KEY_DATE + ")", "count(*)"},
+                null,
+                null,
+                "date(" + h.BOOKMARKS_KEY_DATE + ")",
+                null,
+                "date(" + h.TABLE_BOOKMARKS + "." + h.BOOKMARKS_KEY_DATE + ")"
+        );
+
+        HashMap dates = new HashMap<String, Integer>();
+
+        // fill dates
+        result.moveToFirst();
+        while( !result.isAfterLast() ) {
+            dates.put(
+                    result.getString(result.getColumnIndexOrThrow("date(" + h.BOOKMARKS_KEY_DATE + ")")),
+                    result.getInt(result.getColumnIndexOrThrow("count(*)"))
+            );
+            result.moveToNext();
+        }
+
+        return dates;
     }
 
     /**

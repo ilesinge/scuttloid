@@ -20,6 +20,7 @@ package gr.ndre.scuttloid;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,6 +43,7 @@ public class ScuttleAPI implements APITask.Callback {
 	protected static final int CREATE = 2;
 	protected static final int DELETE = 3;
     protected static final int LAST_UPDATE = 4;
+    protected static final int DATES = 5;
 
     protected int serverAPIVersion;
 
@@ -49,15 +51,20 @@ public class ScuttleAPI implements APITask.Callback {
 	protected static final String GET_PATH = "api/posts_all.php";
 	protected static final String DELETE_PATH = "api/posts_delete.php";
     protected static final String LAST_UPDATE_PATH = "api/posts_update.php?datemode=modified";
+    protected static final String DATES_PATH = "api/posts_dates.php";
 
 	protected String url;
 	protected String username;
 	protected String password;
 	protected Integer handler;
 	protected boolean accept_all_certs;
+
+    // temporary information used by 'needsUpdate'
+    protected HashMap<String, Integer> dates = null, local_dates;
+    protected long last_update, last_sync;
 	
 	protected Callback callback;
-	
+
 	/**
 	 * Constructor injecting mandatory preferences
 	 */
@@ -78,19 +85,24 @@ public class ScuttleAPI implements APITask.Callback {
 
     /**
      * get date and time of last modification on server
+     * Accept local_dates to fix deletion detection bug.
      */
-    public void getLastUpdate() {
-        if( this.serverAPIVersion == 1 ) {
-            // In the current version of the semantic scuttle API deletions are not detectable
-            // instead the bookmarks are always reloaded
-            Date date = new Date();
-            ((LastUpdateCallback) this.callback).onLastUpdateReceived( date.getTime() );
-        } else {
-            this.handler = LAST_UPDATE;
-            APITask task = this.getAPITask(LAST_UPDATE_PATH);
-            task.setHandler(new LastUpdateXMLHandler());
-            task.execute();
-        }
+    public void getLastUpdate( long last_sync, HashMap<String, Integer> local_dates ) {
+        this.local_dates = local_dates;
+        this.last_sync = last_sync;
+
+        this.handler = LAST_UPDATE;
+        APITask task = this.getAPITask(LAST_UPDATE_PATH);
+        task.setHandler(new LastUpdateXMLHandler());
+        task.execute();
+    }
+
+    /**
+     * get date and time of last modification on server
+     * without parameters
+     */
+    public void getLastUpdate( long last_sync ) {
+        this.getLastUpdate( last_sync, new HashMap<String, Integer>() );
     }
 
 	public void getBookmarks() {
@@ -145,6 +157,14 @@ public class ScuttleAPI implements APITask.Callback {
 		task.addAcceptableStatus(HttpStatus.SC_NOT_FOUND);
 		task.execute();
 	}
+
+    // get posts/dates
+    public void getDates() {
+        this.handler = DATES;
+        APITask task = this.getAPITask(DATES_PATH);
+        task.setHandler(new DatesXMLHandler());
+        task.execute();
+    }
 	
 	@Override
 	public void onDataReceived(DefaultHandler xml_handler, int status) {
@@ -184,11 +204,47 @@ public class ScuttleAPI implements APITask.Callback {
 				}
 				break;
             case LAST_UPDATE:
-                long last_update = ((LastUpdateXMLHandler) xml_handler).last_update;
-                ((LastUpdateCallback) this.callback).onLastUpdateReceived(last_update);
+                this.last_update = ((LastUpdateXMLHandler) xml_handler).last_update;
+                this.needsUpdate();
+                break;
+            case DATES:
+                this.dates = ((DatesXMLHandler) xml_handler).getDates();
+                this.needsUpdate();
                 break;
 		}
 	}
+
+    /**
+     * Waits for information (posts/update and posts/dates) to determine if an update of the database is needed.
+     * Calls the Update Callback with the parameter 'needs_update' set to true if an update is needed.
+     */
+    protected void needsUpdate() {
+        // if change has been detected: no need to check for deletions
+        if( this.last_update != this.last_sync ) {
+            ((LastUpdateCallback) this.callback).onLastUpdateReceived(true, this.last_update);
+        } else {
+            // check for deletions if the used API has the deletion detection bug
+            if( this.hasDeletionDetectionBug() ) {
+                if( this.dates == null ) {
+                    // load remote dates (count of bookmarks per date returned by posts/dates)
+                    getDates();
+                } else {
+                    //TODO: it would be simpler to just compare the total number of bookmarks.
+                    if( !this.local_dates.equals( this.dates ) ) {
+                        // some bookmarks were deleted. force a refresh
+                        ((LastUpdateCallback) this.callback).onLastUpdateReceived(true,  this.last_update);
+                    } else {
+                        // no bookmarks where deleted*. refresh depending on date returned by posts/update
+                        // *NOTE: it is possible, that the same number of bookmarks have been deleted as there have been new bookmarks
+                        //        However, the creation of new bookmarks is detected by posts/update in the previous step.
+                        ((LastUpdateCallback) this.callback).onLastUpdateReceived(this.last_update != this.last_sync, this.last_update);
+                    }
+                }
+            } else {
+                ((LastUpdateCallback) this.callback).onLastUpdateReceived(this.last_update != this.last_sync, this.last_update);
+            }
+        }
+    }
 
 	protected void sendResultError(DefaultHandler xml_handler) {
 		String result = ((ResultXMLHandler) xml_handler).code;
@@ -254,6 +310,13 @@ public class ScuttleAPI implements APITask.Callback {
 			this.callback.onAPIError(message);
 		}
 	}
+
+    /**
+     * Returns true if deletion detection bug exists in used API
+     */
+    public boolean hasDeletionDetectionBug() {
+        return this.serverAPIVersion == 1;
+    }
 	
 	public interface Callback {
 		void onAPIError(String message);
@@ -282,7 +345,7 @@ public class ScuttleAPI implements APITask.Callback {
 	}
 
     public interface LastUpdateCallback extends Callback {
-        void onLastUpdateReceived( long last_update );
+        void onLastUpdateReceived( boolean needs_update, long last_update );
     }
 
 }

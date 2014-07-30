@@ -28,7 +28,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Database information
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "ScuttloidBookmarks.db";
 
     // Table information
@@ -39,6 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String BOOKMARKS_KEY_DESCRIPTION = "description";
     static final String BOOKMARKS_KEY_STATUS = "status";
     static final String BOOKMARKS_KEY_HASH = "hash";
+    static final String BOOKMARKS_KEY_DATE = "time";
 
     static final String TABLE_TAGS = "tag";
     static final String TAGS_KEY_TAGID = "tagid";
@@ -74,6 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 BOOKMARKS_KEY_URL + " TEXT NOT NULL, " +
                 BOOKMARKS_KEY_TITLE + " TEXT NOT NULL, " +
                 BOOKMARKS_KEY_DESCRIPTION + " TEXT, " +
+                BOOKMARKS_KEY_DATE + " TEXT, " +
                 BOOKMARKS_KEY_STATUS + " INTEGER, " +
                 BOOKMARKS_KEY_HASH + " BLOB UNIQUE )"
         );
@@ -96,6 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+        //TODO: reload (refresh) bookmarks after update
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKMARKS);
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_TAGS);
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_TAG_NAMES);

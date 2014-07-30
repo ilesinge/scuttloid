@@ -66,20 +66,22 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
      */
     public void refreshBookmarks() {
         //get time of last update on server
-        scuttleAPI.getLastUpdate();
+        if( scuttleAPI.hasDeletionDetectionBug() ) {
+            scuttleAPI.getLastUpdate( database.getLastSync(), database.getDates() );
+        } else {
+            scuttleAPI.getLastUpdate( database.getLastSync() );
+        }
     }
 
     /**
      * Last update time received
      */
     @Override
-    public void onLastUpdateReceived(long remote_update_time) {
+    public void onLastUpdateReceived(boolean needs_update, long remote_update_time) {
         // store, to pass to database later
         this.remote_update_time = remote_update_time;
-        // get last updated time from local database
-        long local_update_time = database.getLastSync();
         // if remote data is newer
-        if( local_update_time < remote_update_time ) {
+        if( needs_update ) {
             //get bookmarks
             scuttleAPI.getBookmarks();
         } else {
