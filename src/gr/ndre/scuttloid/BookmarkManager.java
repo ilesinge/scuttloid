@@ -21,7 +21,7 @@ package gr.ndre.scuttloid;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.Date;
+import java.util.Set;
 
 import gr.ndre.scuttloid.database.DatabaseConnection;
 
@@ -30,7 +30,7 @@ import gr.ndre.scuttloid.database.DatabaseConnection;
  */
 public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCallback, ScuttleAPI.BookmarksCallback, ScuttleAPI.LastUpdateCallback, ScuttleAPI.DeleteCallback, ScuttleAPI.UpdateCallback {
 
-    private ScuttleAPI scuttleAPI;
+    private ScuttleAPI scuttleAPI; //TODO: using a single instance of ScuttleAPI is dangerous, because the handler is changed internally depending on how it is used.
     private DatabaseConnection database;
 
     private long remote_update_time;
@@ -83,7 +83,11 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
         // if remote data is newer
         if( needs_update ) {
             //get bookmarks
-            scuttleAPI.getBookmarks();
+            if( scuttleAPI.knowsBookmarkHashes() ) {
+                scuttleAPI.getBookmarks( database.getHashes() );
+            } else {
+                scuttleAPI.getBookmarks( null );
+            }
         } else {
             ( (BookmarksCallback)callback ).onBookmarksReceived(null);
         }
@@ -104,7 +108,59 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
                 new Runnable() {
                     @Override
                     public void run() {
-                        database.setBookmarks(bookmarks, remote_update_time);
+                        database.setBookmarks(bookmarks);
+                        database.setLastSync( remote_update_time );
+                    }
+                }
+        ).start();
+    }
+
+    /**
+     * Received Bookmarks Patch
+     * @param bookmarks: bookmarks that have changed/created since last sync
+     */
+    @Override
+    public void onBookmarksDiffReceived(final BookmarkContent bookmarks) {
+        // apply patch to current set of bookmarks
+        BookmarkContent old_bookmarks = BookmarkContent.getShared();
+        // remove changed bookmarks
+        old_bookmarks.removeItems( bookmarks );
+        // add all new/changed bookmarks
+        old_bookmarks.addItems( bookmarks );
+        // return to callback
+        ( (BookmarksCallback)callback ).onBookmarksReceived(old_bookmarks);
+
+        // store bookmarks locally
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        database.addBookmarks(bookmarks);
+                        database.setLastSync( remote_update_time );
+                    }
+                }
+        ).start();
+    }
+
+    /**
+     * Remove local bookmarks that have been deleted on the server
+     * @param hashes: hashes of deleted bookmarks
+     */
+    @Override
+    public void onBookmarksDeletedReceived(final Set<String> hashes) {
+        BookmarkContent old_bookmarks = BookmarkContent.getShared();
+        // remove deleted bookmarks
+        for( String hash: hashes ) {
+            old_bookmarks.removeByHash( hash );
+        }
+        BookmarkContent.setShared(old_bookmarks);
+
+        // remove bookmarks from local database
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        database.removeBookmarks(hashes);
                     }
                 }
         ).start();
@@ -160,7 +216,6 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
     /**
      * Bookmark deleted
      * TODO: update local storage after deleting bookmark
-     * TODO: deletions on server are not detected yet
      */
     @Override
     public void onBookmarkDeleted() {

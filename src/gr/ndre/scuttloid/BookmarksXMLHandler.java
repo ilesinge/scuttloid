@@ -22,6 +22,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.security.MessageDigest;
 
 public class BookmarksXMLHandler extends DefaultHandler {
 	
@@ -40,6 +41,21 @@ public class BookmarksXMLHandler extends DefaultHandler {
 			bookmark.tags = attributes.getValue("tag");
 			bookmark.description = attributes.getValue("extended");
             bookmark.time = attributes.getValue("time");
+            bookmark.hash = attributes.getValue("hash");
+            if( bookmark.hash == null ) {
+                // generate an md5 hash from the url
+                try {
+                    MessageDigest md = MessageDigest.getInstance("MD5");
+                    byte[] array = md.digest( bookmark.url.getBytes() );
+                    StringBuffer sb = new StringBuffer();
+                    for (int i = 0; i < array.length; ++i) {
+                        sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+                    }
+                    bookmark.hash = sb.toString();
+                } catch (java.security.NoSuchAlgorithmException e) {
+                }
+            }
+            bookmark.meta = attributes.getValue("meta");
 			this.bookmarks.addItem(bookmark);
 		}
 	}

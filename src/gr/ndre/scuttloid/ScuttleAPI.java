@@ -19,12 +19,13 @@
 package gr.ndre.scuttloid;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Set;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -41,6 +42,8 @@ import android.webkit.URLUtil;
 public class ScuttleAPI implements APITask.Callback {
 	
 	protected static final int BOOKMARKS = 0;
+    protected static final int BOOKMARKS_HASHES = 6;
+    protected static final int BOOKMARKS_DIFF = 7;
 	protected static final int UPDATE = 1;
 	protected static final int CREATE = 2;
 	protected static final int DELETE = 3;
@@ -50,10 +53,12 @@ public class ScuttleAPI implements APITask.Callback {
     protected int serverAPIVersion;
 
     protected static final String ADD_PATH = "/posts/add";
-    protected static final String GET_PATH = "/posts/all";
+	protected static final String ALL_PATH = "/posts/all";
+    protected static final String HASHES_PATH = "/posts/all?hashes";
+    protected static final String GET_PATH = "/posts/get";
     protected static final String DELETE_PATH = "/posts/delete";
-    protected static final String LAST_UPDATE_PATH = "api/posts_update.php?datemode=modified";
-    protected static final String DATES_PATH = "api/posts_dates.php";
+    protected static final String LAST_UPDATE_PATH = "/posts/update?datemode=modified";
+    protected static final String DATES_PATH = "/posts/dates";
 
 	protected String url;
 	protected String username;
@@ -61,9 +66,10 @@ public class ScuttleAPI implements APITask.Callback {
 	protected Integer handler;
 	protected boolean accept_all_certs;
 
-    // temporary information used by 'needsUpdate'
+    // temporary information used by 'needsUpdate' and 'getBookmarksDiff'
     protected HashMap<String, Integer> dates = null, local_dates;
     protected long last_update, last_sync;
+    protected HashMap<String, String> local_bookmark_hashes = null;
 	
 	protected Callback callback;
 
@@ -115,12 +121,67 @@ public class ScuttleAPI implements APITask.Callback {
         this.getLastUpdate( last_sync, new HashMap<String, Integer>() );
     }
 
-	public void getBookmarks() {
-		this.handler = BOOKMARKS;
-		APITask task = this.getAPITask(GET_PATH);
-		task.setHandler(new BookmarksXMLHandler());
-		task.execute();
+    /**
+     * get (changed) bookmarks
+     * @param local_bookmark_hashes: HashMap containing all the hash-meta pairs of the local bookmarks. If null, all bookmarks are resynced
+     */
+	public void getBookmarks( HashMap<String, String> local_bookmark_hashes ) {
+        // for modern APIs only get modification hashes of bookmarks
+        if( local_bookmark_hashes != null && this.knowsBookmarkHashes() ) {
+            this.handler = BOOKMARKS_HASHES;
+            this.local_bookmark_hashes = local_bookmark_hashes;
+            APITask task = this.getAPITask(HASHES_PATH);
+            task.setHandler(new BookmarksHashesXMLHandler());
+            task.execute();
+        } else {
+            this.handler = BOOKMARKS;
+            APITask task = this.getAPITask(ALL_PATH);
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("meta", "yes"));
+            task.setData( params );
+            task.setHandler(new BookmarksXMLHandler());
+            task.execute();
+        }
 	}
+
+    protected void getBookmarksDiff( HashMap<String, String> bookmark_hashes ) {
+        // Get a set of changed and deleted bookmarks.
+        // New or changed bookmarks correspond to those hash-meta pairs that are unique to the remote bookmark hashes
+        StringBuilder changed = new StringBuilder();
+        // Deleted bookmarks correspond to the hashes unique to the local bookmarks.
+        Set<String> deleted = new HashSet<String>( this.local_bookmark_hashes.keySet() );
+        // The key
+        for( String bookmark_hash : bookmark_hashes.keySet() ) {
+            if( this.local_bookmark_hashes.containsKey(bookmark_hash) ) {
+                // Hashes that appear in both Maps have not been deleted
+                deleted.remove(bookmark_hash);
+                if( !bookmark_hashes.get(bookmark_hash).equals( this.local_bookmark_hashes.get(bookmark_hash) ) ) {
+                    // if the meta of local and remote hashes are not equal, bookmark has changed.
+                    changed.append(bookmark_hash).append(' ');
+                }
+            } else {
+                // Hashes that appear only in the remote bookmarks are new
+                changed.append(bookmark_hash).append(' ');
+            }
+        }
+        if( changed.length() > 0 ) {
+            changed.deleteCharAt( changed.length() - 1 );
+        }
+
+        // Delete bookmarks locally, that have been deleted on the server
+        ((BookmarksCallback) this.callback).onBookmarksDeletedReceived( deleted );
+
+        // get changed/new bookmarks for the server
+        this.handler = BOOKMARKS_DIFF;
+        APITask task = this.getAPITask(GET_PATH);
+        task.setMethod(APITask.METHOD_POST);
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("hashes", changed.toString()));
+        params.add(new BasicNameValuePair("meta", "yes"));
+        task.setData( params );
+        task.setHandler(new BookmarksXMLHandler());
+        task.execute();
+    }
 	
 	public void updateBookmark(BookmarkContent.Item item) {
 		this.handler = UPDATE;
@@ -183,6 +244,13 @@ public class ScuttleAPI implements APITask.Callback {
 				BookmarkContent bookmarks = ((BookmarksXMLHandler) xml_handler).getBookmarks();
 				((BookmarksCallback) this.callback).onBookmarksReceived(bookmarks);
 				break;
+            case BOOKMARKS_HASHES:
+                this.getBookmarksDiff(((BookmarksHashesXMLHandler) xml_handler).bookmark_hashes);
+                break;
+            case BOOKMARKS_DIFF:
+                BookmarkContent bookmarks_diff = ((BookmarksXMLHandler) xml_handler).getBookmarks();
+                ((BookmarksCallback) this.callback).onBookmarksDiffReceived( bookmarks_diff );
+                break;
 			case UPDATE:
 				if (status == HttpStatus.SC_OK) {
 					((UpdateCallback) this.callback).onBookmarkUpdated();
@@ -327,6 +395,13 @@ public class ScuttleAPI implements APITask.Callback {
     public boolean hasDeletionDetectionBug() {
         return this.serverAPIVersion == 1;
     }
+
+    /**
+     * Returns true if API can be used to get changed bookmarks only
+     */
+    public boolean knowsBookmarkHashes() {
+        return this.serverAPIVersion == 0;
+    }
 	
 	public interface Callback {
 		void onAPIError(String message);
@@ -339,6 +414,8 @@ public class ScuttleAPI implements APITask.Callback {
 	
 	public interface BookmarksCallback extends Callback {
 		void onBookmarksReceived(BookmarkContent bookmarks);
+        void onBookmarksDiffReceived(BookmarkContent bookmarks);
+        void onBookmarksDeletedReceived( Set<String> hashes );
 	}
 	
 	public interface UpdateCallback extends Callback {

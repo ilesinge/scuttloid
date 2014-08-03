@@ -330,6 +330,8 @@ public class BookmarkListActivity extends ListActivity implements BookmarkManage
 	@Override
 	public void onBookmarksReceived(BookmarkContent new_bookmarks) {
         if( new_bookmarks != null ) {
+            new_bookmarks.clearTemp();
+            new_bookmarks.sort();
             this.bookmarks = new_bookmarks;
             BookmarkContent.setShared(new_bookmarks);
         }

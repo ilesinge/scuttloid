@@ -19,11 +19,19 @@
 package gr.ndre.scuttloid;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Helper class for providing Bookmark content for user interfaces.
@@ -39,12 +47,22 @@ public class BookmarkContent {
 	 * A map of bookmark items, by URL.
 	 */
 	protected Map<String, Item> item_map = new HashMap<String, Item>();
-	
+
+    /**
+     * A map of bookmark items, by hash.
+     */
+    protected Map<String, Item> item_hash_map = new HashMap<String, Item>();
+
 	/**
 	 * An array of bookmark items.
 	 */
 	protected ArrayList<Item> items = new ArrayList<Item>();
-	
+
+    /**
+     * A set of temporary bookmark items. These will be removed when syncing with the server
+     */
+    protected Set<Item> temp_items = new HashSet<Item>();
+
 	/**
 	 * Get shared instance
 	 */
@@ -71,10 +89,31 @@ public class BookmarkContent {
 	 */
 	public void removeItem(String url) {
 		int position = this.getPosition(url);
-		this.item_map.remove(url);
-		this.items.remove(position);
+        if( position != -1 ) {
+            this.item_map.remove(url);
+            this.item_hash_map.remove( this.items.get(position).hash );
+            this.items.remove(position);
+        }
 	}
-	
+
+    /**
+     * Remove items contained in another BookmarkContent object
+     */
+    public void removeItems(BookmarkContent remove_bookmarks) {
+        for( Item item : remove_bookmarks.getItems() ) {
+            this.removeByHash( item.hash );
+        }
+    }
+
+    public void removeByHash( String hash ) {
+        Item item = this.item_hash_map.get(hash);
+        if( item != null ) {
+            this.item_map.remove(item.url);
+            this.items.remove(item);
+            this.item_hash_map.remove(hash);
+        }
+    }
+
 	/**
 	 * Get item list
 	 */
@@ -86,19 +125,46 @@ public class BookmarkContent {
 	 * Add a bookmark to the collection.
 	 */
 	public void addItem(Item item) {
-		this.items.remove(item);
-		this.items.add(item);
-		this.item_map.put(item.url, item);
+        this.addItemAt(item, -1);
 	}
 	
 	/**
 	 * Add a bookmark to the top of the collection
 	 */
 	public void addItemToTop(Item item) {
-		this.items.remove(item);
-		this.items.add(0, item);
-		this.item_map.put(item.url, item);
+		this.addItemAt(item, 0);
 	}
+
+    /**
+     * Add a bookmark at selected position
+     * @param item: bookmark item
+     * @param position: position where item is added. -1 for default position.
+     */
+    protected void addItemAt(Item item, int position) {
+        this.items.remove(item);
+        if( position == -1 ) {
+            this.items.add(item);
+        } else {
+            this.items.add(0, item);
+        }
+        this.item_map.put(item.url, item);
+        if( item.hash == null ) {
+            item.hash = item.url;
+            this.item_hash_map.put(item.url, item);
+            this.temp_items.add(item);
+        } else {
+            this.item_hash_map.put(item.hash, item);
+        }
+    }
+
+    /**
+     * Add items contained in another BookmarkContent object
+     */
+    public void addItems(BookmarkContent remove_bookmarks) {
+        for( Item item : remove_bookmarks.getItems() ) {
+            this.addItem( item );
+        }
+    }
 	
 	public int getPosition(String url) {
 		Item item = this.item_map.get(url);
@@ -107,6 +173,24 @@ public class BookmarkContent {
 		}
 		return -1;
 	}
+
+    /**
+     * Clear temporary bookmarks
+     * These bookmarks have been added directly by scuttloid and will be replaced when synced
+     */
+    public void clearTemp() {
+        for( Item item : this.temp_items ) {
+            this.removeByHash( item.hash );
+        }
+        this.temp_items.clear();
+    }
+
+    /**
+     * Sort items by creation time (newest first)
+     */
+    public void sort() {
+        Collections.sort( this.items, Item.DateComparator );
+    }
 
 	/**
 	 * A bookmark item representing a piece of content.
@@ -120,6 +204,8 @@ public class BookmarkContent {
 		public String description;
 		public String status;
         public String time;
+        public String hash;
+        public String meta;
 		
 		protected String tags;
 		
@@ -154,5 +240,27 @@ public class BookmarkContent {
         public void setTags(String[] tag_array) {
             tags = TextUtils.join(" ", tag_array);
         }
+
+        /**
+         * Compare create date of two bookmarks. Used for sorting
+         */
+        public static Comparator<Item> DateComparator = new Comparator<Item>() {
+            @Override
+            public int compare(Item item, Item item2) {
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                boolean diff = false;
+                try {
+                   diff = df.parse(item.time).getTime() < df.parse(item2.time).getTime();
+                } catch (ParseException e) {
+                    Log.e("Scuttloid", e.getMessage());
+                }
+                if( diff ) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        };
+
 	}
 }

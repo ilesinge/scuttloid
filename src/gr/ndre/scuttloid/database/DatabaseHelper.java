@@ -28,7 +28,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Database information
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "ScuttloidBookmarks.db";
 
     // Table information
@@ -39,6 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String BOOKMARKS_KEY_DESCRIPTION = "description";
     static final String BOOKMARKS_KEY_STATUS = "status";
     static final String BOOKMARKS_KEY_HASH = "hash";
+    static final String BOOKMARKS_KEY_META = "meta";
     static final String BOOKMARKS_KEY_DATE = "time";
 
     static final String TABLE_TAGS = "tag";
@@ -77,7 +78,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 BOOKMARKS_KEY_DESCRIPTION + " TEXT, " +
                 BOOKMARKS_KEY_DATE + " TEXT, " +
                 BOOKMARKS_KEY_STATUS + " INTEGER, " +
-                BOOKMARKS_KEY_HASH + " BLOB UNIQUE )"
+                BOOKMARKS_KEY_HASH + " BLOB UNIQUE, " +
+                BOOKMARKS_KEY_META + " BLOB )"
         );
 
         // table for tag-bookmark relations
