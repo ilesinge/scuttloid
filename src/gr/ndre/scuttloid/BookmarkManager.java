@@ -66,11 +66,16 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
      */
     public void refreshBookmarks() {
         //get time of last update on server
-        if( scuttleAPI.hasDeletionDetectionBug() ) {
-            scuttleAPI.getLastUpdate( database.getLastSync(), database.getDates() );
-        } else {
+        if( scuttleAPI.knowsBookmarkUpdates() ) {
             scuttleAPI.getLastUpdate( database.getLastSync() );
+        } else {
+            // no need to check for updates. Just download the bookmarks:
+            onLastUpdateReceived( true, 0L );
         }
+        //TODO: DeletionDetectionBug: remove this if + content
+        // DeletectionDetectionBug workaround has been disabled:
+        // if( scuttleAPI.hasDeletionDetectionBug() ) {
+        //    scuttleAPI.getLastUpdate( database.getLastSync(), database.getDates() );
     }
 
     /**

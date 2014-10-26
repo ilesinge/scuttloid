@@ -67,7 +67,7 @@ public class ScuttleAPI implements APITask.Callback {
 	protected boolean accept_all_certs;
 
     // temporary information used by 'needsUpdate' and 'getBookmarksDiff'
-    protected HashMap<String, Integer> dates = null, local_dates;
+    protected HashMap<String, Integer> dates = null, local_dates; //TODO: DeletionDetectionBug: remove these variables
     protected long last_update, last_sync;
     protected HashMap<String, String> local_bookmark_hashes = null;
 	
@@ -102,6 +102,7 @@ public class ScuttleAPI implements APITask.Callback {
     /**
      * get date and time of last modification on server
      * Accept local_dates to fix deletion detection bug.
+     * TODO: DeletionDetectionBug: remove this version of the function and move content to function below
      */
     public void getLastUpdate( long last_sync, HashMap<String, Integer> local_dates ) {
         this.local_dates = local_dates;
@@ -302,6 +303,7 @@ public class ScuttleAPI implements APITask.Callback {
             ((LastUpdateCallback) this.callback).onLastUpdateReceived(true, this.last_update);
         } else {
             // check for deletions if the used API has the deletion detection bug
+            //TODO: DeletionDetectionBug: remove this if + content
             if( this.hasDeletionDetectionBug() ) {
                 if( this.dates == null ) {
                     // load remote dates (count of bookmarks per date returned by posts/dates)
@@ -391,9 +393,22 @@ public class ScuttleAPI implements APITask.Callback {
 
     /**
      * Returns true if deletion detection bug exists in used API
+     * This returns always false, because the workaround does not word due to the
+     * Modification detection bug: https://github.com/cweiske/SemanticScuttle/pull/7
+     * //TODO: DeletionDetectionBug: remove this function
      */
     public boolean hasDeletionDetectionBug() {
-        return this.serverAPIVersion == 1;
+        return false;
+    }
+
+    /**
+     * Returns true if the API supports update detection
+     * This is not the case for semantic scuttle <= v0.98.5
+     * See https://github.com/cweiske/SemanticScuttle/pull/7
+     * ans https://github.com/cweiske/SemanticScuttle/pull/8
+     */
+    public boolean knowsBookmarkUpdates() {
+        return this.serverAPIVersion == 0;
     }
 
     /**
