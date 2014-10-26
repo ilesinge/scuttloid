@@ -145,7 +145,7 @@ public class BookmarkContent {
         if( position == -1 ) {
             this.items.add(item);
         } else {
-            this.items.add(0, item);
+            this.items.add( position, item);
         }
         this.item_map.put(item.url, item);
         if( item.hash == null ) {
@@ -160,10 +160,19 @@ public class BookmarkContent {
     /**
      * Add items contained in another BookmarkContent object
      */
-    public void addItems(BookmarkContent remove_bookmarks) {
-        for( Item item : remove_bookmarks.getItems() ) {
+    public void addItems(BookmarkContent add_bookmarks) {
+        for( Item item : add_bookmarks.getItems() ) {
             this.addItem( item );
         }
+    }
+
+    /**
+     * Update a bookmark in the collection.
+     */
+    public void updateItem( Item item ) {
+        int position = getPosition( item.url );
+        //replace at same position
+        addItemAt( item, position );
     }
 	
 	public int getPosition(String url) {
