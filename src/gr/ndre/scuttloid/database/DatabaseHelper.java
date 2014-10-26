@@ -19,13 +19,19 @@
 package gr.ndre.scuttloid.database;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import gr.ndre.scuttloid.BookmarkListActivity;
 
 /**
  * Handles database creation and connection
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
+
+    // context
+    private final Context context;
 
     // Database information
     private static final int DATABASE_VERSION = 3;
@@ -64,6 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // private constructor, instance is accessible via getInstance
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -100,7 +107,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-        //TODO: reload (refresh) bookmarks after update
+        // set preference to refresh bookmarks.
+        SharedPreferences preferences = context.getSharedPreferences(BookmarkListActivity.LIST_PREFS, 0);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(BookmarkListActivity.LIST_PREFS_NEEDS_REFRESH, true);
+        editor.apply();
+        // empty all tables
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKMARKS);
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_TAGS);
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_TAG_NAMES);
