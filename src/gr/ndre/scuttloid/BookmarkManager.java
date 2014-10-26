@@ -35,6 +35,8 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
 
     private long remote_update_time;
 
+    private BookmarkContent.Item createItem, editItem, deleteItem;
+
     protected String url;
     protected String password;
 
@@ -175,15 +177,16 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
      * Create bookmark
      */
     public void createBookmark(BookmarkContent.Item item) {
+        this.createItem = item;
         scuttleAPI.createBookmark(item);
     }
 
     /**
      * bookmark created
-     * TODO: update local storage after creating bookmark
      */
     @Override
     public void onBookmarkCreated() {
+        database.addBookmark( this.createItem );
         ( (CreateCallback)callback ).onBookmarkCreated();
     }
 
@@ -199,15 +202,16 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
      * Update bookmark
      */
     public void updateBookmark(BookmarkContent.Item item) {
+        this.editItem = item;
         scuttleAPI.updateBookmark(item);
     }
 
     /**
      *  Bookmark updated
-     *  TODO: update local storage after updating bookmark
      */
     @Override
     public void onBookmarkUpdated() {
+        database.addBookmark( this.editItem );
         ( (UpdateCallback)callback ).onBookmarkUpdated();
     }
 
@@ -215,18 +219,18 @@ public class BookmarkManager implements ScuttleAPI.Callback, ScuttleAPI.CreateCa
      * Delete bookmark
      */
     public void deleteBookmark(BookmarkContent.Item item) {
+        this.deleteItem = item;
         scuttleAPI.deleteBookmark(item);
     }
 
     /**
      * Bookmark deleted
-     * TODO: update local storage after deleting bookmark
      */
     @Override
     public void onBookmarkDeleted() {
+        database.removeBookmark( this.deleteItem );
         ( (DeleteCallback)callback ).onBookmarkDeleted();
         // clear cache, to refetch remote bookmarks on reload
-        database.clearCache();
     }
 
     /**

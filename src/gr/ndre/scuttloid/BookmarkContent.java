@@ -262,11 +262,12 @@ public class BookmarkContent {
                    diff = df.parse(item.time).getTime() < df.parse(item2.time).getTime();
                 } catch (ParseException e) {
                     Log.e("Scuttloid", e.getMessage());
-                }
-                if( diff ) {
-                    return 1;
-                } else {
-                    return -1;
+                } finally {
+                    if( diff ) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
                 }
             }
         };

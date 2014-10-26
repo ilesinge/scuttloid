@@ -25,6 +25,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -75,11 +78,24 @@ public class DatabaseConnection {
         Set<String> tags = extractTags(bookmarks);
         Map<String, Long> tagMap = setTags(tags);
 
+        // prepare current date
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        Date date = new Date();
+        String currDate = dateFormat.format(date);
+
         try {
             db.beginTransaction();
 
             // store all bookmarks
             for (BookmarkContent.Item item : bookmarks.getItems()) {
+                // check for null values
+                if( item.hash == null ) {
+                    item.hash = item.url;
+                }
+                if( item.time == null ) {
+                    item.time = currDate;
+                }
+
                 // remove existing tag connections first
                 int num = db.delete(DatabaseHelper.TABLE_TAGS, DatabaseHelper.TAGS_KEY_BOOKMARKID +
                         " IN ( SELECT " + DatabaseHelper.BOOKMARKS_KEY_ID + " FROM " + DatabaseHelper.TABLE_BOOKMARKS +
@@ -117,6 +133,17 @@ public class DatabaseConnection {
     }
 
     /**
+     * Add Bookmark. Replace if bookmark (with same hash) already exists
+     * @param item: bookmark item
+     */
+    public void addBookmark( BookmarkContent.Item item ) {
+        // wrap in BookmarkContent and forward to addBookmarks.
+        BookmarkContent bookmarkContent = new BookmarkContent();
+        bookmarkContent.addItem( item );
+        addBookmarks( bookmarkContent );
+    }
+
+    /**
      * Remove bookmarks with specified hashes
      * @param hashes: set of hashes of bookmarks to be removed
      */
@@ -143,6 +170,17 @@ public class DatabaseConnection {
             // delete unused tags
             this.removeUnusedTags();
         }
+    }
+
+    /**
+     * Remove bookmark
+     * @param item: bookmark item
+     */
+    public void removeBookmark( BookmarkContent.Item item ) {
+        // wrap in set of hashes and forward to removeBookmarks
+        Set<String> hash = new HashSet<String>();
+        hash.add( item.hash );
+        removeBookmarks( hash );
     }
 
     /**
